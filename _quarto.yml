@@ -1,0 +1,19 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Mukeka & Tech"
+  navbar:
+    right:
+      - about.qmd
+      - icon: github
+        href: https://github.com/hcmarchezi
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+
+
+

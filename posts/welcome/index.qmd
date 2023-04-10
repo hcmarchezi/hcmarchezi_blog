@@ -1,0 +1,16 @@
+---
+title: "Welcome To My Blog"
+author: "Humberto C Marchezi"
+date: "2023-04-07"
+categories: [news]
+---
+
+![](thumbnail.jpg)
+
+After a very long winter to share ideas and thought in the tech and research area,
+I decided to be back with a shiny and practical bloging tool.
+
+This is my first blog page with github pages and quarto.
+Quarto is a publishing tool that allows to mix text in Markdown, diagrams and also python or r-generated graphics. 
+
+Hope yo be able to finally be able to share good content here.

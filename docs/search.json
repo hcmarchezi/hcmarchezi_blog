@@ -1,0 +1,23 @@
+[
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this blog"
+  },
+  {
+    "objectID": "posts/welcome/index.html",
+    "href": "posts/welcome/index.html",
+    "title": "Welcome To My Blog",
+    "section": "",
+    "text": "After a very long winter to share ideas and thought in the tech and research area, I decided to be back with a shiny and practical bloging tool.\nThis is my first blog page with github pages and quarto. Quarto is a publishing tool that allows to mix text in Markdown, diagrams and also python or r-generated graphics.\nHope yo be able to finally be able to share good content here."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Articles",
+    "section": "",
+    "text": "Welcome To My Blog\n\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\n\n\nApr 7, 2023\n\n\nHumberto C Marchezi\n\n\n\n\n\n\nNo matching items"
+  }
+]
