@@ -1,0 +1,172 @@
+---
+title: "DynamicProxy: An Elegant Solution for Session/Transaction/Exception Management in NHibernate (or any other ORM)"
+author: "Humberto C Marchezi"
+date: "2009-08-27"
+categories: [software-engineering]
+---
+
+<div dir="ltr" style="text-align: left;" trbidi="on">
+
+Session management is a well solved problem for web applications and
+many detailed solutions can be found in the internet. The same is not
+true for winforms applications. Although there are solutions available
+in the internet, many of them are theoretical or just “complicated” for
+the medium programmer. Besides that it was difficult to find a solution
+(I have never found one) that could work for both web and winforms
+applications.  
+  
+After a while (days), it came up to me the idea of using service proxies
+with **Castle Dynamic Proxies**. It turned out to be the easiest and
+cleanest approach I could think of because it has the ability to inject
+(aspects) behaviour around the service methods.  
+  
+The idea can be coded in the following way:  
+
+-   **Service classes with standard namespace and virtual methods**
+
+  
+  
+
+``` prettyprint
+namespace Sample.Service
+{
+  public class SystemLogRegistrationService
+  {
+    public virtual void Modify(long codLogSistema)
+    {
+      SystemLog systemLog = Repository.Get().Load(codLogSistema);            
+      systemLog.SetMachine = "MAQUINA" + DateTime.Now;
+      systemLog.SetUserName = "PESSOA" + DateTime.Now;            
+      systemLog.SetSystemName = "SISTEMA" + DateTime.Now;
+      Repository.Get().Save(systemLog);            
+    }
+  }
+}
+```
+
+  
+  
+Do not get distracted with the service code. The important thing to
+notice above is that the service does not contain anything else other
+than processing the domain classes (in this case, SystemLog). Also note
+that **all service methods must be virtual**. Without that, dynamic
+proxy won't work for these methods. The details of Repository
+implementation are out of the scope of this article and this subject is
+covered in enough details in several articles throughout the internet.
+(You can also send me a comment or email if you need information about
+that)  
+  
+
+-   **Usage Example**
+
+  
+  
+In order to make use of proxified services, one must create some kind of
+generator whose creation will be explained next. The ProxyGenerator
+below is a simple static class for didactic purposes that is responsible
+for dynamically generate proxies from a given type injecting the
+necessary aspects such as session/transaction management and exception
+handling or any other aspect you might think about.  
+  
+
+``` brush:csharp
+SomeService serv = ProxyGenerator.InjectSessionTransactionExceptionAspects &lt SomeService &gt ();
+serv.Modify(12048); // <= Modify method has session/transaction/exception management
+```
+
+-   **Creating a proxy service factory**
+
+The proxy generator can be implemented using Castle Dynamic Proxy API.  
+
+``` prettyprint
+using System;
+using Castle.DynamicProxy;
+
+namespace Sample.Persistence
+{
+  public static class ProxyGenerator 
+  {
+    private static ProxyGenerator _generator = new ProxyGenerator();        
+    public static TService InjectSessionTransactionExceptionAspects &lt TService &gt ()
+    {
+      return (TService)_generator.CreateClassProxy(
+        typeof(TService),
+        new SessionTransactionExceptionAspect());    
+    }
+  }
+}
+```
+
+-   **An interceptor for the service class methods**
+
+``` prettyprint
+using System;
+using Castle.DynamicProxy;
+using NHibernate;
+using NHibernate.Context;
+
+namespace Sample.Persistence
+{
+  /// 
+  /// Intercepts service methods (must be virtual) and inject
+  /// session / transaction and exception aspects
+  /// 
+  public class SessionTransactionExceptionAspect: IInterceptor
+  {
+    /// 
+    /// Intercepts service methods and adds the following behaviors
+    /// >>> Before executing a method:
+    ///     * opens session
+    ///     * begins transaction
+    /// >>> After executing method:
+    ///     * Commits transaction
+    /// >>> In case there is exception
+    ///     * Rollbacks transaction
+    ///     * Handles exception
+    /// >>> At the end
+    ///     * Closes session
+    /// 
+    public object Intercept(IInvocation invocation, params object[] args)
+    {
+      object retorno = null;
+      ITransaction tx = null;
+      try
+      {          
+        CurrentSessionContext.Bind(SessionFactory.Instance.OpenSession());
+        tx = SessionFactory.Instance.GetCurrentSession().BeginTransaction();
+        retorno = invocation.Proceed(args);
+        tx.Commit();
+      }
+      catch (Exception exception)
+      {
+        if (tx != null) { tx.Rollback(); }
+          throw exception;
+      }
+      finally
+      {
+        ISession s = SessionFactory.Instance.GetCurrentSession();
+        s.Close();
+        CurrentSessionContext.Unbind(s.SessionFactory);
+      }
+      return retorno;
+    }
+  }
+}
+```
+
+Above is the center of the whole idea. The interceptor class above
+captures only the service methods and ignores the rest. The following
+tasks are executed inside a try-catch-finally: (when it is a service
+method)  
+
+-   Session is created
+-   Transaction is initialized
+-   The method itself is executed
+-   if method is ok, transaction is confirmed
+-   if there is exception, transaction is cancelled and exception is
+    handled
+-   Finally session is closed
+
+</div>
+
+  

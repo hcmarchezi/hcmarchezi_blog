@@ -1,0 +1,163 @@
+---
+title: "Model View Controller with Events in .NET"
+author: "Humberto C Marchezi"
+date: "2009-12-26"
+categories: [software-engineering]
+---
+
+<div dir="ltr" style="text-align: left;" trbidi="on">
+
+<div>
+
+This is often a confused design pattern and its main purpose is to
+separate objects that assume different roles in a software.  
+These roles are:
+
+</div>
+
+-   models - objects that actual execute the system tasks
+-   views - objects that display the system data
+-   controllers - objects that capture the user intentions from the view
+    and route to the right actions
+
+<div>
+
+Usually Views have a reference to the controller however another
+approach below shows how to decouple the views from the controllers.  
+Views can be implemented in several ways depending on the UI library.
+For that reason, views are better represented as interfaces. However in
+order to reduce coupling between views and controllers, <span
+style="font-weight: bold;">events </span>can be used in the interface
+views.
+
+</div>
+
+The example below shows a client registration view:  
+
+``` prettyprint
+using System;
+namespace MyController
+{
+  public interface IClientRegistrationView
+  {
+    public long Id { get; set; }
+    public string Name { get; set; }
+    public string Registration { get; set; }
+    public event ClientEventHandler InsertRequested;
+    public event ClientEventHandler UpdateRequested;
+    public event ObjectIdEventHandler &lt long &gt RemoveRequested;
+    public event ObjectIdEventHandler &lt long &gt RetrieveRequested;
+  }
+}
+```
+
+Specific event arguments were also created for the Client Registration
+View:  
+
+-   <span style="font-weight: bold;">ClientEventArgs </span>- contains
+    client fields so that it can be sent to the underlying layer.
+-   <span style="font-weight: bold;">ObjectIdEventArgs </span>- contains
+    a generic object id for deletion and queries purposes.  
+
+  
+
+<div>
+
+See event argument classes below:
+
+</div>
+
+  
+
+``` prettyprint
+using System;
+namespace MyController
+{
+  public delegate void ClientEventHandler(object sender, ClientEventArgs e);
+  public class ClientEventArgs : EventArgs
+  {
+  public long Id { get; set; }
+  public string Name { get; set; }
+  public string Registration { get; set; }
+  }
+}
+```
+
+  
+
+``` prettyprint
+using System;
+namespace MyController
+{
+  public delegate void ObjectIdEventHandler &lt T &gt (object sender, ObjectIdEventArgs &lt T &gt e);
+  public class ObjectIdEventArgs &lt T &gt : EventArgs
+  {
+    public T Id { get; set; }
+  }
+}
+```
+
+  
+
+<div>
+
+  
+The controller will have a reference to a view (an interface) and it
+will access the view´s data fields for the client which is Id, Name and
+Registration.  
+Besides that, the controller will also be told to trigger actions by
+listening to the view´s events.  
+In this example, the service acts as if it was the model of the system.
+
+</div>
+
+  
+
+``` prettyprint
+using System;
+using MyService;
+namespace MyController
+{
+  public class ClientRegistrationController
+  {
+    private IClientRegistrationView View { get; set; }
+    private ClientRegistrationService Service { get; set; }
+    public ClientRegistrationController(IClientRegistrationView view)
+    {
+      View = view;
+      View.InsertRequested += new ClientEventHandler(View_InsertRequested);
+      View.UpdateRequested += new ClientEventHandler(View_UpdateRequested);
+      View.RemoveRequested += new ObjectIdEventHandler &lt long &gt (View_RemoveRequested);
+      View.RetrieveRequested += new ObjectIdEventHandler &lt long &gt (View_RetrieveRequested);
+      Service = new ClientRegistrationService();   
+    }
+    void View_InsertRequested(object sender, ClientEventArgs e)
+    {
+      ClientDTO dto = new ClientDTO() { Id = e.Id, Name = e.Name, Registration = e.Registration };
+      Service.Insert(dto);
+      this.View.Id = dto.Id;
+    }
+    void View_UpdateRequested(object sender, ClientEventArgs e)
+    {
+      Service.Update(new ClientDTO() { Id = e.Id, Name = e.Name, Registration = e.Registration });
+    }
+    void View_RemoveRequested(object sender, ObjectIdEventArgs &lt long &gt e)
+    {
+      Service.Remove(e.Id);
+    }
+    void View_RetrieveRequested(object sender, ObjectIdEventArgs &lt long &gt e)
+    {
+      ClientDTO dto = Service.Retrieve(e.Id);
+      this.View.Id = dto.Id;
+      this.View.Name = dto.Name;
+      this.View.Registration = dto.Registration;
+    }
+  }
+}
+```
+
+As it can be seen above, the View doesn´t need to have a reference to
+the Controller. The view is totally decoupled form the controller but it
+can communicate with it by listening to the events.
+
+</div>

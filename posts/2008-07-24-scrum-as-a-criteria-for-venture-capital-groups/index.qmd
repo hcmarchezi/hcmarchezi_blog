@@ -1,0 +1,40 @@
+---
+title: "Scrum as a criteria for Venture Capital Groups"
+author: "Humberto C Marchezi"
+date: "2008-07-24"
+categories: [software-engineering]
+---
+
+I just read a Foreword from Jeff Sutherland ( co-creator of Scrum ) from
+the book "Scrum and XP from the Trenches" where he comments how he
+chooses companies who really apply Scrum framework ( an agile framework
+or methodology to develop software ) for a venture capital group as an
+agile coach.  
+  
+The more time pass the more I realize how agile software development
+will play an important role in near future. It already plays an
+important role but it can become a requirement for startup companies in
+search for funding from venture capital groups.  
+  
+If a company can not deliver its products in time or can not deliver
+working software or can not deliver something that was not what the
+client was expecting, it should not be expected that they would receive
+funding. As Mike Cohn cited in the same book in his foreword, agile
+development is not about beautiful documentation or future-problem-proof
+code, it is about software done and working. And that's exactly what
+clients need and expect from a software company.  
+At the same time, Scrum as well as other kinds of agile software ideas (
+be it frameworks, methodologies or practices ) is very easy to put in
+practice. Any company or organization can start using this idea anytime
+they want.  
+  
+If you have an idea about how is the Scrum process in five minutes or
+so, take a look at this articles:
+<http://www.softhouse.se/Uploades/Scrum_eng_webb.pdf>  
+  
+Addionally the book "Scrum and XP from the Trenches" mentioned in the
+beginning of this post can be downloaded here:
+<http://www.infoq.com/minibooks/scrum-xp-from-the-trenches>  
+  
+Personally, as a software developer and a small investor I will take
+Jeff's tip for future investments in tech companies.

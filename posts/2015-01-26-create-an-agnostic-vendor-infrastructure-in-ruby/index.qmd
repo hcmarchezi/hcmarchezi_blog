@@ -1,0 +1,52 @@
+---
+title: "Create an Agnostic Vendor Infrastructure in Ruby"
+author: "Humberto C Marchezi"
+date: "2015-01-26"
+categories: [software-engineering]
+---
+
+<div dir="ltr" style="text-align: left;" trbidi="on">
+
+Depending how the code was written adding new services to it can be
+difficult.  
+For instance, let's say we are building a rails application that gets
+integrated to cloud storage vendors.  
+A naive implementation would be to directly integrate to a cloud storage
+specific APIs.  
+In this case when new cloud storage vendors are added it is very
+probable that several nasty **case... when ... end** statements would be
+inserted in code.  
+  
+
+When a new cloud storage service is added the developer must remember
+all places where those growing case-like statements are inserted. This
+makes the system more susceptible to errors due to  changes in several
+parts of the code. This problem is explained in detail by the shotgun
+surgery anti-pattern (<http://en.wikipedia.org/wiki/Shotgun_surgery>)  
+  
+The rest of the system shouldn't be aware that a new cloudstorage
+service was added. That is where a combination of design patterns come
+in handy:  
+
+-   a facade to provide a simple interface for cloud storage operations 
+-   a service locator to find the right cloud storage adapter
+-   a cloud storage adapters that make each vendor API compliant to a
+    single defined interface that can be understood by the facade
+
+  
+![](https://docs.google.com/drawings/d/1KjeuJpOAId3tUyO41OAfSVL-9rFSNxDCIbnOY--dBaA/pub?w=590&h=561)  
+**1) Cloud Storage Facade**  
+  
+
+**2) Cloud Storage Adapter Locator**  
+  
+
+**3) Cloud Storage Adapters**  
+  
+
+Note that this combination of patterns can be used to abstract many
+other types of services. Cloud storage service was just an example used
+here.  
+  
+
+</div>

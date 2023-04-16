@@ -1,0 +1,132 @@
+---
+title: "Choosing the Right Primary Keys"
+author: "Humberto C Marchezi"
+date: "2007-12-03"
+categories: [software-engineering]
+---
+
+One of the most common data modeling is the use of composite keys and
+natural keys as primary keys to identify tables in the database.  
+Composite-key tables use more than one key to identify a row while
+natural keys use domain information to identify a row such as Social
+Security Number to identify a Person. In most cases a composite-key is
+actually a composite-natural-key.  
+  
+However these tecniques are not consider good practices to choose the
+table primary keys due to the following factors:  
+
+Business Rules change over time but primary keys don't  
+
+-   Business rules are dynamic but primary keys are static until you
+    update the database model what can cost a lot time and effort if not
+    impossible. For example if you identify a Client with a Social
+    Security number you may not be able to identify a foreign Person if
+    needed or maybe the government can decide to use the same Social
+    Security Number for more than one person. This lack of capacity to
+    change the database model can reduce significantly the agility of an
+    organization to adapt its business model to new kind of reality what
+    reduces its capacity to compete with other organizations.
+
+  
+
+<div style="text-align: center;">
+
+*Figure 1 - Table identified by a natural key*  
+
+</div>
+
+<div id="y4sa" style="padding: 1em 0pt; text-align: center;">
+
+<div id="hb0m" style="padding: 1em 0pt; text-align: center;">
+
+![](http://docs.google.com/File?id=dd9jw5vs_97pv77k6g7)  
+
+</div>
+
+</div>
+
+Composite Keys require more work
+
+-   It is necessary to write longer SQL queries since you have to use
+    all the primary keys to join this table to another one.
+
+  
+
+    select cli.name, pd.description, sa.date, sa.quantity
+    from Client cli
+    inner join Sales sa on
+    ( cli.socialSecurityNumber = sa.socialSecurityNumber )
+    inner join Product pd on
+    ( sa.idProductType = pd.idProductType and
+    sa.vendorRegistration = pd.vendorRegistration )
+    where sa.date >= '2007-12-01'
+
+  
+
+Make the Database model less readable
+
+-   Composite keys spread to other tables as a foreign key and are added
+    to other foreign composite-key columns. In some cases where
+    composite-keys are widely used there are much more composite-key
+    columns in a table than useful information.
+
+  
+
+<div style="text-align: center;">
+
+*Figure 2 - Only date and quantity are Sales columns*  
+
+</div>
+
+<div style="text-align: center;">
+
+*the rest are inherited primakey keys from other tables*
+
+</div>
+
+<div id="j-f6" style="padding: 1em 0pt; text-align: center;">
+
+![](http://docs.google.com/File?id=dd9jw5vs_96dsqwdwgk)  
+*  
+*
+
+</div>
+
+In the other hand one of the stronger arguments in favor of composite
+and natural-keys is that they provide a safer way to restrict data
+integrity avoiding certain columns in a table to repeat while with a
+single primary key can not garantee this.  
+But many people forget that this data integrity can be done in
+single-primary tables too by using alternate keys. With alternate keys
+you can choose a group of columns in a table make them unique just like
+a composite-key would do it.  
+  
+In order to present this idea in more details below there are two
+examples, one with the traditional composite-key and natural keys
+aproach and the other with the proposed idea of using single primaty
+keys ( non-natural keys ) and alternate keys.  
+*  
+*
+
+<div style="text-align: center;">
+
+*Figure 3- Data model example that makes use of natural-keys*  
+
+</div>
+
+<div style="text-align: center;">
+
+![](http://docs.google.com/File?id=dd9jw5vs_98cnzjw7hp)  
+  
+<span style="font-style: italic;">Figure 4 - Data model example with
+single primary keys and alternate keys</span>  
+
+<div id="h0gu" style="padding: 1em 0pt; text-align: center;">
+
+![](http://docs.google.com/File?id=dd9jw5vs_99c49jxdgw)
+
+</div>
+
+  
+
+</div>

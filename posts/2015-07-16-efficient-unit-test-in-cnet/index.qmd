@@ -1,0 +1,102 @@
+---
+title: "Efficient Unit Test in C#.NET"
+author: "Humberto C Marchezi"
+date: "2015-07-16"
+categories: [software-engineering]
+---
+
+<div dir="ltr" style="text-align: left;" trbidi="on">
+
+I consider unit tests one of the most important practices in agile
+programming.  
+As the name stated, unit tests check the behaviour of the smaller part
+of an object what can be a constructor, method or property.  
+
+```
+[TestFixture]
+public class SomeTest
+{
+[Test]
+public void CheckDiscountCalculation()
+{
+Product prod1 = new Product("T-Shirt",125.0d); // description and price
+Product prod2 = new Product("Apple",10.0d);
+Product prod3 = new Product("Pants",50.0d);
+
+OrderItem item1 = new OrderItem(prod1,1); // product and quantity
+OrderItem item2 = new OrderItem(prod2,1);
+OrderItem item3 = new OrderITem(prod3,1);
+
+Client client = new Client("Jack");
+
+Order order = new Order(client);
+order.AddItem(item1);
+order.AddItem(item2);
+order.AddItem(item3);
+
+decimal discount = order.CalculateDiscount();
+
+Assert.AreEqual(18.5d, discount);        
+}
+}
+```
+
+  
+Although the test example above is perfectly possible you can note that
+much of this test was spent in initializing the neighbour objects before
+actually testing the discount calculation.  
+In real world tests, this can get much more complicated, with several
+dependencies around the objects. Besides that it can be even more
+difficult to initialize objects when they access the database internally
+even through interfaces.  
+  
+In order to minimize this problem, there are mock frameworks that can be
+used together with NUnit or your preferred unit testing framework.
+Basically mock framework can dynamically generate fake objects from
+class types so that you can focus on testing in your target object.  
+In the example above, the target is the Order. My preferred Mock
+framework is Moq due to its heavy usage of delegate notations which
+avoid using magical strings to configure Mock classes and setup
+methods.  
+  
+The above test now can be rewritten like this:  
+  
+
+```
+[TestFixture]
+public class SomeTest
+{
+[Test]
+public void CheckDiscountCalculation()
+{
+Mock prod1Mock = new Mock();
+prod1Mock.Setup(p=>p.Price).Returns(125.0d); // Ignores method implementation and returns 125.0d
+
+Mock prod2Mock = new Mock();
+prod2Mock.Setup(p=>p.Price).Returns(10.0d);
+
+Mock prod3Mock = new Mock();
+prod3Mock.Setup(p=>p.Price).Returns(50.0d);
+
+
+
+
+OrderItem item1 = new OrderItem(prod1,1); // product and quantity
+OrderItem item2 = new OrderItem(prod2,1);
+OrderItem item3 = new OrderITem(prod3,1);
+
+Client client = new Client("Jack");
+
+Order order = new Order(client);
+order.AddItem(item1);
+order.AddItem(item2);
+order.AddItem(item3);
+
+decimal discount = order.CalculateDiscount();
+
+Assert.AreEqual(18.5d, discount);        
+}
+}
+```
+
+</div>

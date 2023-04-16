@@ -1,0 +1,286 @@
+---
+title: "Rails: New Framework - Old Design Problems"
+author: "Humberto C Marchezi"
+date: "2013-12-18"
+categories: [software-engineering]
+---
+
+<div dir="ltr" style="text-align: left;" trbidi="on">
+
+I have been programming for Rails for about 2-3 years now. As I came
+from a C\# background it was a bit awkward for me to see some design
+principles I took as good practices being unashamedly broken such as:  
+  
+
+-   data-driven models mixed with persistence logic instead of plain old
+    domain objects
+-   controllers being used as application scenarios instead of
+    coordinators between my actual application object and the view (
+    that was my understanding of MVC )
+
+<div>
+
+At that time I just thought it was the *ruby-on-rails* way of doing
+things and as a good newcomer in the ruby developer community I decided
+I should learn and listen more from other rails developers and forums
+than telling what the best practices should be.
+
+</div>
+
+<div>
+
+  
+
+</div>
+
+<div>
+
+However after some years of work experience I realized some of those
+design problems were not sufficiently addressed for some anti-patterns:
+( At least not until this year - some problems are still not addressed )
+
+</div>
+
+<div>
+
+-   fat controllers / skinny models
+-   skinny controllers / fat models
+-   god models
+-   transparent polyglot persistence in domain models ( SQL, NoSQL,
+    Graph, etc ... )
+
+<div>
+
+Note that these design problems were solved in other programming
+environments long ago.
+
+</div>
+
+<div>
+
+  
+
+</div>
+
+<div>
+
+Now with the maturity of rails developer community and the increasing
+adoption of rails in many enterprises I see design patterns and ideas
+being presented more often. 
+
+</div>
+
+</div>
+
+<div>
+
+The objective of these ideas seems to be the same: keep active record
+models focused only on data and extracting out logic of any kind (
+business, view, etc.. ) to other classes or modules.
+
+</div>
+
+<div>
+
+Some ideas that called my attention are:
+
+</div>
+
+<div>
+
+-   Use of service objects that orchestrate rails models in handling
+    complex scenarios
+-   Use of rails concerns (modules) to extract behavior or methods that
+    do not belong to the model responsibility (which in rails means data
+    persistence and validation)
+
+<div>
+
+Some oppose to rails concerns because it can lead your rails model class
+to have many roles instead of one-role. ( This is a popular clean code
+principle: one class, one role )
+
+</div>
+
+<div>
+
+However in his article DHH gave good reasons for doing it what actually
+made me open an exception for this clean code principle for this
+particular ruby case. ( I am a clean code fan and exceptions are rare)
+
+</div>
+
+<div>
+
+  
+
+</div>
+
+<div>
+
+In this case this clean code principle of one-role-class became a bit
+different for me after reading DHH article (see reference below in
+chubby models): 
+
+</div>
+
+<div>
+
+-   one class should have one **IMPLEMENTATIONAL** role. 
+
+</div>
+
+<div>
+
+In Ruby a **rails model should implement only ONE role** while it can be
+injected by many others.
+
+</div>
+
+<div>
+
+For instance it is not a problem that your class contain many roles
+since they come from mixins.
+
+</div>
+
+<div>
+
+However mixins (or Rails concerns) should augment the rails model
+features and not make your class implementation dependent on them. It is
+not forbidden to be dependent on mixins such as by active record or
+mongoid since they are part of the **one implementational role defined
+for the class** but some caution is needed.
+
+</div>
+
+<div>
+
+  
+
+</div>
+
+<div>
+
+In the other hand the idea of using a service object can make it clear
+that some complex business concepts are executed separately. Scenarios
+include payment process, authentication and many others. Its benefit is
+very clear to me.
+
+</div>
+
+<div>
+
+  
+
+</div>
+
+<div>
+
+Both ideas are of great help to keep both controllers and models on a
+diet ( skinny controller / skinny models ) but other design problems
+such as transparent polyglot persistence and possible many others remain
+unanswered.
+
+</div>
+
+<div>
+
+  
+
+</div>
+
+<div>
+
+I hope to see what the ruby community will have to say about that in the
+future.
+
+</div>
+
+<div>
+
+Maybe I can answer some of those questions, who knows ?
+
+</div>
+
+<div>
+
+  
+
+</div>
+
+</div>
+
+<div>
+
+References:
+
+</div>
+
+<div>
+
+<http://blog.codeclimate.com/blog/2012/10/17/7-ways-to-decompose-fat-activerecord-models/>
+
+</div>
+
+<div>
+
+<http://37signals.com/svn/posts/3372-put-chubby-models-on-a-diet-with-concerns>
+
+</div>
+
+<div>
+
+  
+
+</div>
+
+<div>
+
+  
+
+</div>
+
+<div>
+
+  
+
+</div>
+
+<div>
+
+  
+
+</div>
+
+<div>
+
+  
+
+</div>
+
+<div>
+
+  
+
+</div>
+
+<div>
+
+  
+
+</div>
+
+<div>
+
+  
+
+</div>
+
+<div>
+
+  
+
+</div>
+
+</div>

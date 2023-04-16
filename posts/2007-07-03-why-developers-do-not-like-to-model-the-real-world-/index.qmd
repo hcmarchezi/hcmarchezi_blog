@@ -1,0 +1,75 @@
+---
+title: "Why developers do not like to model the Real World ?"
+author: "Humberto C Marchezi"
+date: "2007-07-03"
+categories: [software-engineering]
+---
+
+Years ago the concept of roles, real world modeling, reusability and
+many others were not known. People with different roles were modeled in
+different entities ( tables or classes ) as if they were different
+things. In many database models such as the Northwind example we would
+find a table for Clients, another table for Vendors, a table for
+Employees and so on.  
+This kind of approach leads to data ambiguity since a Person can be an
+Employee in some occasions and a Vendor in other occasions or this
+Person can be a Client. So if a Persons must have his address, name,
+contact, etc. modified, this change must be reflected in several other
+tables. This business rule or better this <span
+style="font-weight: bold;">developer rule</span> should be remembered by
+anyone responsible for developing a system that could modify the data in
+one of these tables.  
+  
+The approach changed but recently I was taking a look at a Class Diagram
+from a work colleague and it called my attention that he modeled the
+Accounting Role as Class Accountant.  
+It is not uncommon to see the same pattern when modeling peoples roles
+in many other Class Diagrams or even Data Diagram ( Entity Relation ) .
+Many developers usually create a class (or table) for each role like
+this:  
+  
+[<img src="http://3.bp.blogspot.com/_WHpubqoOAQY/Ror10cMxdGI/AAAAAAAAAA8/qmaHtgtrFpE/s320/pattern_role_0.bmp" id="BLOGGER_PHOTO_ID_5083145410712794210" />](http://3.bp.blogspot.com/_WHpubqoOAQY/Ror10cMxdGI/AAAAAAAAAA8/qmaHtgtrFpE/s1600-h/pattern_role_0.bmp)It
+is not hard to see that as long as the system grows, more roles are
+needed. The additional classes multiply in the Class Model making it
+each time more complex to understand.  
+  
+Interestingly there is an Analysis Pattern that deals with people's
+roles problem by providing a more elegant Class Modeling like this:  
+[<img src="http://3.bp.blogspot.com/_WHpubqoOAQY/Ror1EcMxdEI/AAAAAAAAAAs/62_LPab-5mU/s320/pattern_role_1.bmp" id="BLOGGER_PHOTO_ID_5083144586079073346" />](http://3.bp.blogspot.com/_WHpubqoOAQY/Ror1EcMxdEI/AAAAAAAAAAs/62_LPab-5mU/s1600-h/pattern_role_1.bmp)Now
+the roles are better organized and if more roles are needed they can be
+added to the Class Hierarchy. And that is all right.  
+  
+This could be a perfect solution to the problem but let me ask you a
+question.  
+<span style="font-weight: bold;">Do the roles really exist in Real World
+?</span>  
+I mean, imagine there are no computers and information systems, how do
+you do to know someone's role in your organization ? Do you ask: What's
+your role ? Off course not.  
+  
+If you are working for a Health Care Company, for example, in order to
+check if "Jack" is a doctor you ask him his Doctor License ( or Medical
+License or whatever document is used in your country ). To work as a
+Doctor, Jack must have this document (or license). He may not carry this
+document with him maybe it may not exist physically but there is some
+sort of license or document that grants him the permission to work with
+others people's lives.  
+  
+The same happens for accountants. Accountants do not work with people
+lives but in many countries they must have a document or license that
+enables him or her to do their jobs.  
+In order to know if someone is an accountant, you just have to check if
+he has an Accountant Registration ( or any name you prefer ).  
+  
+Using document or license ( think of licenses and document as the same
+thing ) metaphor instead of roles gives you a more natural
+representation of your business rules. If the Class Diagram is more
+naturally represented by using Real World characteristics it is also
+more intuitive. Thus it can be better understood and learned by newcome
+developers or other developers in a large enterprise system. Check out
+the Class Diagram below:  
+  
+[<img src="http://3.bp.blogspot.com/_WHpubqoOAQY/Ror7BcMxdII/AAAAAAAAABM/aS6AswIh7Pc/s400/pattern_role_2.bmp" id="BLOGGER_PHOTO_ID_5083151131609232514" />](http://3.bp.blogspot.com/_WHpubqoOAQY/Ror7BcMxdII/AAAAAAAAABM/aS6AswIh7Pc/s1600-h/pattern_role_2.bmp)The
+Class Diagram above shows a Person with his/her documents the way as it
+is in the Real World. If a another Document Type is needed it can be
+added to the hierarchy just like the prior class diagram.

@@ -1,0 +1,57 @@
+---
+title: "Name Convention for Object Oriented Apps"
+author: "Humberto C Marchezi"
+date: "2010-02-24"
+categories: [software-engineering]
+---
+
+<span class="Apple-style-span"
+style="font-family: Georgia; font-size: 13px;">Some time ago I came
+across with a question about naming conventions for different parts of
+the software: UI, Service, Entities, etc. I decided to share some of the
+conventions I have been using.</span>  
+<span class="Apple-style-span"
+style="font-family: Georgia; font-size: small;"><span
+class="Apple-style-span" style="font-size: 13px;">**<u>  
+</u>**</span></span>  
+<span class="Apple-style-span"
+style="font-family: Georgia; font-size: 13px;"><u>**Naming Convention: (
+Most used ):**</u>  
+  
+- **Entities**: As it is part of the domain package, no prefixes or
+suffixes here: <u>Ex:</u> Car, Client, etc.  
+  
+- **Repository**: Usually a suffix
+Repository. <u>Ex:</u> ClientRepository, CarRepository, etc.  
+  
+- **ValueObject**: Value objects are part of the domain so it follows
+entity´s convention. <u>Ex:</u> Money, Address, etc.  
+  
+- **DTO**: Usually a suffix DTO. <u>Ex:</u> ClientRegistrationDTO,
+CarRentDTO, AddressDTO, etc.  
+  
+- **Service**: Usually a suffix
+Service. <u>Ex:</u> ClientRegistrationService, CarRentService, etc.  
+  
+<u>**Namespace Convention:**</u> (My Suggestion)  
+  
+**Entities, ValueObjects, Repositories Interfaces, Domain
+Services** **(Domain Layer)**  
+..Domain.  
+<u>Ex:</u> Acme.Finantial.Domain.Debt,  
+      Acme.HR.Domain.CheckOvertimeService,  
+      Acme.Core.Domain.IPersonRepository      
+  
+**Application Services **  
+..Service.  
+<u>Ex:</u> Acme.Sales.Service.ClientRegistrationService  
+  
+**Presentation Layer**  
+..Presentation.  
+Ex: Acme.HR.Presentation.IClientRegistrationView,
+Acme.HR.Presentation.WebClientRegistration  
+  
+**Persistence Layer**  
+..Persistence.  
+Ex: Acme.Core.Persistence.PersonRepositoryImpl (\<--- implementation in
+NH, for example)</span>

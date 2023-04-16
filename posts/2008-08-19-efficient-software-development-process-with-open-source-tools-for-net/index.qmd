@@ -1,0 +1,110 @@
+---
+title: "Efficient Software Development Process with Open-Source Tools for .NET"
+author: "Humberto C Marchezi"
+date: "2008-08-19"
+categories: [software-engineering]
+---
+
+When a software is been built, a series of characteristics must be
+pursuit in order to deliver a quality product during the development
+process:  
+
+-   Agility  
+-   Testability
+-   Readability
+-   Extensibility  
+-   Automated Documentation
+
+It it important to say that I presume many readers of this text are
+already convinced about the advantages brought by object oriented
+programming when compared to traditional development and the tools
+presented below support this kind of programming paradigm besides the
+goals specified above.  
+  
+**Object-Relational Mapping Tool: Castle Project Active Record**  
+  
+One of the most time-consuming things in software development is mapping
+classes in tables.  
+This process is partially automated by tools such as NHibernate but the
+Active Record offered by Castle Project not only maps classes to tables
+but it is also capable to generate the database from the object model
+which confers agility to the software process.  
+<http://www.castleproject.org/activerecord/index.html>  
+  
+**Source-Code Standards: FXCop**  
+  
+Although it is free, FXCop is not a free-software since its code is
+private owned by Microsoft.  
+Anyway it is very a useful tool whose objective is to verify if quality
+metrics and/or naming conventions of a project are been followed
+appropriately by the team members.  
+By using naming well defined and known programming conventions, code
+readability is enhanced and different projects can be understood by
+every programmer in a software company.  
+[http://msdn.microsoft.com/en-us/library/bb429476(VS.80).aspx](http://msdn.microsoft.com/en-us/library/bb429476%28VS.80%29.aspx)  
+  
+**Unit Tests: NUnit**  
+  
+It is the most used automated testing tool for .NET . These tests play
+an important role in a software project since they bring more confidence
+to developers to change software when needed since they can point out
+when a certain piece of the software might be broken due to some
+modification. Obviously NUnit brings testability to the software
+development environment.  
+<http://www.nunit.org/index.php>  
+  
+**Test Coverage: PartCover**  
+  
+How can you know what parts of your code is being covered by automated
+tests ?  
+This process is called test coverage and it is the objective of
+PartCover.  
+Altough NCover is largely mentioned in the net, PartCover is becoming
+increasingly  
+important as a test coverage open-source project.  
+<http://sourceforge.net/projects/partcover/>  
+  
+**Automated Documentation: NDoc**  
+  
+Documentation can be a time consuming task but without it, the software
+extensibility and maintainability can slow down considerably specially
+for people outside the project and unaware of coding practices. One of
+the fastest ways to get documentation is generating it from the
+source-code. NDoc can generate developer level documentation from the
+XML tags in the C\# source-code.  
+<a href="http://ndoc.sourceforge.net/" id="mmns" title="http://ndoc.sourceforge.net">http://ndoc.sourceforge.net</a>  
+  
+**Web Framework: MonoRail**  
+  
+The Castle Project seems to understand what is to have an agile
+development. Having this in mind, MonoRail is a web framework that truly
+obeys the MVC Design Pattern without slowing developers down. Besides
+agile, this framework lets us to have an improved readability also
+compared to traditional ASP.NET programming.  
+<http://www.castleproject.org/monorail/gettingstarted/index.html>  
+  
+**Continuous Integration: Cruise Control .NET**  
+  
+Prior sections some tools for software quality were presented such as
+FXCop, NUnit, PartCover and NDoc. Although useful it is very easy for
+one of the team members to forget to manually execute some of this tools
+during the development process. Remembering and executing these tools
+can also be error prone since some member of the team can forget to
+execute some of these tools.  
+In order to overcome these drawbacks and others, continuous integration
+rised as one the most known practices from Extreme Programming (XP). (
+See XP in
+<a href="http://www.extremeprogramming.org/" id="uhsj" title="http://www.extremeprogramming.org/">http://www.extremeprogramming.org/</a>
+)  
+Basically continuous integration is performed by a build tool such as
+Cruise Control (
+<a href="http://cruisecontrol.sourceforge.net/" id="d0m_" title="http://cruisecontrol.sourceforge.net/">http://cruisecontrol.sourceforge.net/</a>
+) that is responsible for executing specified tasks necessary prior to
+software delivery to the users such as compilation checking, unit tests
+executing, quality metrics verification and finally publication. However
+another combination of tasks can be though such as email notification
+and many others.  
+Generally the continuous integration process is executed manually or
+during the night when there is low activity but it is possible to
+trigger this process through a version control system such as SVN prior
+to accept a commit requested by a team programmer.

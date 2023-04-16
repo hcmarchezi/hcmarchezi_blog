@@ -1,0 +1,119 @@
+---
+title: "Generating Software Documentation from Unit Tests"
+author: "Humberto C Marchezi"
+date: "2008-11-23"
+categories: [software-engineering]
+---
+
+In the beginning of my career as a software developer I participated in
+two software projects with the traditional approach of document-first
+and code later. It didn't take too much time for me to realize this was
+a not a good aproach. We passed months capturing requirements and
+writing use cases just to find later that many use cases was actually
+different from what the stakeholders needed and many requirements have
+changed.  
+  
+Then I came across with agile software development. The idea behind made
+perfect sense for me and some work colleagues and we started to
+introduce slowly this new paradigm in our department. Projects that
+lasted 1 year ( yes ! 1 year ) or more now lasted only a couple of
+months. Besides that because we were demonstrating the software every
+week or two to the stakeholders and thus we had feedback often from
+them.  
+This made us more productive and the final product (the software!)
+gained more quality and more confidence. But what happened to our
+business documentation ? We didn't drop a line of it.  
+  
+Many agilists advocate that agile software development is about absence
+of documentation. Recently many agilists say it is not removing
+documentation but that it is seen from a different perspective from
+document-oriented traditional approach. Only the real necessary
+documentation is produced. Although it sounds perfectly reasonable we
+still need a way to document business rules for the IT sector managers
+and also stakeholders. They couldn't read and understand these rules
+directly from the source-code since they were not programmers or
+technicians. So I started to think of a way to automatically generate
+this documentation.  
+  
+I was talking to Anselmo from Siemens and he gave me an interesting
+idea: Automatic generation of business documentation from unit tests. I
+started thinking how could I implement this alternative in our software
+architecture model where we have a service class for each use case and I
+got to the idea below:  
+  
+For a Client Registration use case we could have the following unit
+tests:  
+
+    [TestFixture][BusinessRules] // Business rule attribute means this test must be documented
+    class Client_Registration_Use_Case
+    { 
+       [Test]
+       void Normal_Flow__Check_if_name_is_not_null() { ... }
+
+       [Test]
+       void Normal_Flow__Check_if_address_is_valid() { ... }
+
+       [Test]
+       void Normal_Flow__Check_if_there_is_another_client_with_same_name() { ... }
+
+       [Test]
+       void Normal_Flow__Save_New_Client() { ... }
+
+       [Test ExpectedException(typeof(NullClientNameException)) ]
+       void Alternative_Flow__If_client_name_is_null_raise_message_to_the_user() { ... }
+
+       [Test ExpectedException(typeof(InvalidClientAddressException)) ]
+       void Alternative_Flow__If_client_address_is_invalid_raise_message_to_the_user() { ... }
+
+       [Test ExpectedException(typeof(ClientNameAlreadyExistsException)) ]
+       void Alternative_Flow__If_another_client_with_the_same_name_was_found_raise_message_to_the_user() { ... }
+    }
+
+  
+  
+At the end, a script in the continuous integration process can read this
+file or assembly and transform very easily this information and save to
+a documentation file such as Docbook, ODT or Word Doc. It is important
+to note that test methods should be placed in the right order so that
+the right documentation can be generated. The only work is reading the
+class and methods names and generate the documentation as follows:  
+  
+-----------------------------------------------------------------  
+<span style="font-weight: bold;">Client Registration Use Case:</span>  
+  
+<span style="font-style: italic;">Normal Flow:</span>  
+
+1.  Check if name is not null
+2.  Check if address is valid
+3.  Check if there is another client with same name
+4.  Save New Client  
+
+<span style="font-style: italic;">Alternate Flows:</span>  
+
+1.  If client name is null raise message to the user
+2.  If client address is invalid raise message to the user
+3.  If another client with the same name was found raise message to the
+    user
+
+-----------------------------------------------------------------  
+  
+This idea has the following advantages:  
+
+-   Documentation reflects exactly what was implemented in the software
+    code and never gets outdated
+-   If a new check or action is needed in a use case documentation, the
+    implementation and NOT documentation is changed
+-   In order to update the documentation, new unit tests are required
+    what can force discipline among the programmers
+-   Every time a release is generated the entire application
+    documentation is updated since the proper unit tests are written  
+
+There disadvantages as well:  
+
+-   Unit tests become more verbose what can slow down its implementation
+    a little bit
+-   Test methods descriptions may not reflect the test performed inside
+
+However I still believe the benefits are higher and I wonder if someone
+is not applying this idea since it sounds so simple. If you have any
+ideas for agile business documentation please get in touch with me.

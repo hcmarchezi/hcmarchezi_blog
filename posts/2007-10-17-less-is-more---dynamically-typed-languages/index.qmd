@@ -1,0 +1,21 @@
+---
+title: "Less is More - Dynamically typed languages"
+author: "Humberto C Marchezi"
+date: "2007-10-17"
+categories: [software-engineering]
+---
+
+When I was in the university I learned that strongly typed languages
+should be preferred since they avoid the programmers from using a
+certain variable in way that it was not meant to.  
+If I declare "string name;" I know this will accept only strings and
+will prevent a programmer from assign a number or a boolean value on
+it.  
+  
+But this seems to be a false concern with the success of other languages
+such as Python and Ruby.  
+This programming languages are now used to each time more complex
+software and nobody is complaining about their "dynamic" features.  
+  
+The goal the new development tools are trying to achieve is how can I do
+my software faster in a clean and organized way. Less is More !

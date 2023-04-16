@@ -1,0 +1,512 @@
+---
+title: "Using .NET Nullable Types with NHibernate 1.2"
+author: "Humberto C Marchezi"
+date: "2009-03-12"
+categories: [software-engineering]
+---
+
+<div dir="ltr" style="text-align: left;" trbidi="on">
+
+Originally, NHibernate 1.2 does not support nullable types from .NET
+such as <span style="font-weight: bold;">DateTime?, int?, bool?</span>,
+etc. but that can be solved by implementing specific NHibernate specific
+user types.  
+Not all nullable user types are listed for all .NET nullable types are
+listed below. But it can be easily done by following the example
+specially for numeric types.  
+However if you need help you jut send an email.  
+  
+Nullable user types code listings:  
+  
+<span style="font-weight: bold;">NullableDateTimeType.cs</span>  
+
+``` prettyprint
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using NHibernate.UserTypes;
+using NHibernate;
+using System.Data;
+using NHibernate.SqlTypes;
+
+namespace Utilitario.GerenciaDados
+{
+  public class NullableDateTimeType : IUserType
+  {
+      #region IUserType Members
+      public bool Equals(object x, object y)
+      {
+          return object.Equals(x, y);
+      }
+      public int GetHashCode(object x)
+      {
+          return x.GetHashCode();
+      }
+      public object NullSafeGet(IDataReader rs, string[] names, object owner)
+      {
+          //object valor = NHibernateUtil.DateTime.NullSafeGet(rs, names[0]);
+          object valor = null;
+          if (rs[names[0]] != DBNull.Value)
+              valor = Convert.ToDateTime(rs[names[0]]);
+
+          DateTime? dateTime = null;
+
+          if (valor != null)
+          {
+              dateTime = (DateTime)valor;
+          }
+          return dateTime;
+      }
+      public void NullSafeSet(IDbCommand cmd, object value, int index)
+      {
+          if (value == null)
+          {
+              NHibernateUtil.String.NullSafeSet(cmd, null, index);
+          }
+          else
+          {
+              DateTime? dateTime = (DateTime)value;
+              NHibernateUtil.AnsiString.NullSafeSet(cmd, dateTime.Value.ToString("yyyy/MM/dd HH:mm:ss.fff"), index);
+          }
+      }
+      public object DeepCopy(object value)
+      {
+          return value;
+      }
+      public object Replace(object original, object target, object owner)
+      {
+          return original;
+      }
+      public object Assemble(object cached, object owner)
+      {
+          return cached;
+      }
+      public object Disassemble(object value)
+      {
+          return value;
+      }
+      public SqlType[] SqlTypes
+      {
+          get { return new SqlType[] { new StringSqlType() }; }
+      }
+      public Type ReturnedType
+      {
+          get { return typeof(string); }
+      }
+      public bool IsMutable
+      {
+          get { return false; }
+      }
+      #endregion
+  }
+}
+```
+
+  
+<span style="font-weight: bold;">NullableBooleanType.cs</span>  
+
+``` prettyprint
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using NHibernate.UserTypes;
+using NHibernate;
+using System.Data;
+using NHibernate.SqlTypes;
+
+namespace Utilitario.GerenciaDados
+{
+  public class NullableBooleanType : IUserType
+  {
+      #region IUserType Members
+      public bool Equals(object x, object y)
+      {
+          return object.Equals(x, y);
+      }
+      public int GetHashCode(object x)
+      {
+          return x.GetHashCode();
+      }
+      public object NullSafeGet(IDataReader rs, string[] names, object owner)
+      {
+          object valor = NHibernateUtil.Boolean.NullSafeGet(rs, names[0]);
+          bool? caracter = null;
+          if (valor != null)
+          {
+              caracter = (bool)valor;
+          }
+          return caracter;
+      }
+      public void NullSafeSet(IDbCommand cmd, object value, int index)
+      {
+          if (value == null)
+          {
+              NHibernateUtil.Boolean.NullSafeSet(cmd, null, index);
+          }
+          else
+          {
+              bool? caracter = (bool)value;
+              NHibernateUtil.Boolean.NullSafeSet(cmd, caracter.Value, index);
+          }
+      }
+      public object DeepCopy(object value)
+      {
+          return value;
+      }
+      public object Replace(object original, object target, object owner)
+      {
+          return original;
+      }
+      public object Assemble(object cached, object owner)
+      {
+          return cached;
+      }
+      public object Disassemble(object value)
+      {
+          return value;
+      }
+      public SqlType[] SqlTypes
+      {
+          get { return new SqlType[] { new StringSqlType() }; }
+      }
+      public Type ReturnedType
+      {
+          get { return typeof(string); }
+      }
+      public bool IsMutable
+      {
+          get { return false; }
+      }
+      #endregion
+  }
+}
+```
+
+  
+<span style="font-weight: bold;">NullableCharType.cs</span>  
+
+``` prettyprint
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using NHibernate.UserTypes;
+using NHibernate;
+using System.Data;
+using NHibernate.SqlTypes;
+
+namespace Utilitario.GerenciaDados
+{
+  public class NullableCharType : IUserType
+  {
+      #region IUserType Members
+      public bool Equals(object x, object y)
+      {
+          return object.Equals(x, y);
+      }
+      public int GetHashCode(object x)
+      {
+          return x.GetHashCode();
+      }
+      public object NullSafeGet(IDataReader rs, string[] names, object owner)
+      {
+          object valor = NHibernateUtil.Character.NullSafeGet(rs, names[0]);
+          Char? caracter = null;
+          if (valor != null)
+          {
+              caracter = (Char)valor;
+          }
+         return caracter;
+      }
+      public void NullSafeSet(IDbCommand cmd, object value, int index)
+      {  
+          if (value == null)
+          {
+               NHibernateUtil.Character.NullSafeSet(cmd, null, index);
+          }
+          else
+          {
+              Char? caracter = (Char)value;
+              NHibernateUtil.Character.NullSafeSet(cmd, caracter.Value, index);
+          }
+      }
+      public object DeepCopy(object value)
+      {
+          return value;
+      }
+      public object Replace(object original, object target, object owner)
+      {
+          return original;
+      }
+      public object Assemble(object cached, object owner)
+      {
+          return cached;
+      }
+      public object Disassemble(object value)
+      {
+          return value;
+      }
+      public SqlType[] SqlTypes
+      {
+          get { return new SqlType[] { new StringSqlType() }; }
+      }
+      public Type ReturnedType
+      {
+          get { return typeof(string); }
+      }
+      public bool IsMutable
+      {
+          get { return false; }
+      }
+      #endregion
+  }
+}
+```
+
+  
+<span style="font-weight: bold;">NullableDecimalType.cs</span>  
+
+``` prettyprint
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using NHibernate.UserTypes;
+using System.Data;
+using NHibernate.Util;
+using NHibernate;
+using NHibernate.SqlTypes;
+
+namespace Utilitario.GerenciaDados
+{
+  public class NullableDecimalType : IUserType
+  {
+      #region IUserType Members
+      public bool Equals(object x, object y)
+      {
+          return object.Equals(x, y);
+      }
+      public int GetHashCode(object x)
+      {
+          return x.GetHashCode();
+      }
+      public object NullSafeGet(IDataReader rs, string[] names, object owner)
+      {
+          object valor = NHibernateUtil.Decimal.NullSafeGet(rs, names[0]);
+          Decimal? inteiro = null;
+          if (valor != null)
+          {
+              inteiro = (Decimal)valor;
+          }
+          return inteiro;
+      }
+      public void NullSafeSet(IDbCommand cmd, object value, int index)
+      {
+          if (value == null)
+          {
+              NHibernateUtil.Decimal.NullSafeSet(cmd, null, index);
+          }
+          else
+          {
+              Decimal? inteiro = (Decimal)value;
+              NHibernateUtil.Decimal.NullSafeSet(cmd, inteiro.Value.ToString().Replace(',','.'), index);
+          }
+      }
+      public object DeepCopy(object value)
+      {
+          return value;
+      }
+      public object Replace(object original, object target, object owner)
+      {
+          return original;
+      }
+      public object Assemble(object cached, object owner)
+      {
+          return cached;
+      }
+      public object Disassemble(object value)
+      {
+          return value;
+      }
+      public SqlType[] SqlTypes
+      {
+          get { return new SqlType[] { new StringSqlType() }; }
+      }
+      public Type ReturnedType
+      {
+          get { return typeof(string); }
+      }
+      public bool IsMutable
+      {
+          get { return false; }
+      }
+      #endregion
+  }
+}
+```
+
+  
+<span style="font-weight: bold;">NullableDoubleType.cs</span>  
+
+``` prettyprint
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using NHibernate.UserTypes;
+using NHibernate;
+using NHibernate.SqlTypes;
+using System.Data;
+
+namespace Utilitario.GerenciaDados
+{
+  public class NullableDoubleType : IUserType
+  {
+      #region IUserType Members
+      public bool Equals(object x, object y)
+      {
+          return object.Equals(x, y);
+      }
+      public int GetHashCode(object x)
+      {
+          return x.GetHashCode();
+      }
+      public object NullSafeGet(IDataReader rs, string[] names, object owner)
+      {
+          object valor = NHibernateUtil.Double.NullSafeGet(rs, names[0]);
+          Double? valorD = null;
+          if (valor != null)
+          {
+              valorD = (double)valor;
+          }
+          return valorD;
+      }
+      public void NullSafeSet(IDbCommand cmd, object value, int index)
+      {
+          if (value == null)
+          {
+              NHibernateUtil.Double.NullSafeSet(cmd, null, index);
+          }
+          else
+          {
+              Double? valor = (Double)value;
+              NHibernateUtil.Double.NullSafeSet(cmd, valor.Value.ToString().Replace(',','.'), index);
+          }
+      }
+      public object DeepCopy(object value)
+      {
+          return value;
+      }
+      public object Replace(object original, object target, object owner)
+      {
+          return original;
+      }
+      public object Assemble(object cached, object owner)
+      {
+          return cached;
+      }
+      public object Disassemble(object value)
+      {
+          return value;
+      }
+      public SqlType[] SqlTypes
+      {
+          get { return new SqlType[] { new StringSqlType() }; }
+      }
+      public Type ReturnedType
+      {
+          get { return typeof(string); }
+      }
+      public bool IsMutable
+      {
+          get { return false; }
+      }
+      #endregion
+  }
+}
+```
+
+<span style="font-weight: bold;">NullableInt32Type.cs</span>  
+
+``` prettyprint
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using NHibernate.UserTypes;
+using System.Data;
+using NHibernate.Util;
+using NHibernate;
+using NHibernate.SqlTypes;
+
+namespace Utilitario.GerenciaDados
+{
+  public class NullableInt32Type : IUserType
+  {
+      #region IUserType Members
+      public bool Equals(object x, object y)
+      {
+          return object.Equals(x, y);
+      }
+      public int GetHashCode(object x)
+      {
+          return x.GetHashCode();
+      }
+      public object NullSafeGet(IDataReader rs, string[] names, object owner)
+      {
+          object valor = NHibernateUtil.Int32.NullSafeGet(rs, names[0]);
+          Int32? inteiro = null;
+          if (valor != null)
+          {
+              inteiro = (Int32)valor;
+          }
+          return inteiro;
+      }
+      public void NullSafeSet(IDbCommand cmd, object value, int index)
+      {
+          if (value == null)
+          {
+              NHibernateUtil.Int32.NullSafeSet(cmd, null, index);
+          }
+          else
+          {
+              Int32? inteiro = (int)value;
+              NHibernateUtil.Int32.NullSafeSet(cmd, inteiro.Value, index);
+          }
+      }
+      public object DeepCopy(object value)
+      {
+          return value;
+      }
+      public object Replace(object original, object target, object owner)
+      {
+          return original;
+      }
+      public object Assemble(object cached, object owner)
+      {
+          return cached;
+      }
+      public object Disassemble(object value)
+      {
+          return value;
+      }
+      public SqlType[] SqlTypes
+      {
+          get { return new SqlType[] { new StringSqlType() }; }
+      }
+      public Type ReturnedType
+      {
+          get { return typeof(string); }
+      }
+      public bool IsMutable
+      {
+          get { return false; }
+      }
+      #endregion
+  }
+}
+```
+
+</div>

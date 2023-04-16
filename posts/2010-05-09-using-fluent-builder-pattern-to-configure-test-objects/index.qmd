@@ -1,0 +1,165 @@
+---
+title: "Using Fluent Builder Pattern to Configure Test Objects"
+author: "Humberto C Marchezi"
+date: "2010-05-09"
+categories: [software-engineering]
+---
+
+<div dir="ltr" style="text-align: left;" trbidi="on">
+
+Depending on the complexity of the domain model, configuring mock
+objects for specific cenarios can make the resulting test code to get
+messy.  
+  
+Consider the situation below with C\#, NUnit and Moq framework  
+  
+
+``` prettyprint
+[Test]
+[ExpectedException(InvalidPaymentAgreementException)]
+public void PaymentAgreementMustNotBeCreatedWhenThePaymentOptionIsNotValidForTheDebtType()
+{
+  Mock somePaymentOptionMock = new Mock();
+  Mock debTypeMock = new Mock();
+  debtTypeMock
+    .Setup(debtType.GetPaymentOptions())
+    .Returns(new List(){somePaymentOptionMock.Object});
+
+  Mock anotherPaymentOptionMock = new Mock();
+
+  Mock debtMock = new Mock();
+  debtMock.Setup(debt.DebtType).Returns(debTypeMock.Object);            
+
+  PaymentAgreement paymentAgreement = new PaymentAgreement(
+    new PaymentAgreementCreationParameter()
+    {
+      AgreementYear = SystemDate.Get().Value.Year,
+      AgreementNumber = 1,
+      AgreementCreationDate = SystemDate.Get().Value.Date,
+      NumberOfInstallments = 1,
+      AgreementValue = 100.0m,
+      Debts = new List() { debtMock.Object },
+      SelectedPaymentOption =  anotherPaymentOptionMock.Object
+    });
+}
+```
+
+  
+A developer who reads the unit test can take a consirable amount of time
+to understand what is actually being tested even if a well-designed mock
+framework such as Moq is in use. Most of this work is about configuring
+mock objects. Besides the code size, the unit test doesn´t speak the
+language of the domain (business) and thus it becomes a mass of
+meaningless mock configuration.  
+I am on my way to learn how to apply TDD effectvely in software
+development and I quickly realized that the quality of unit tests are
+very important in order to this kind of methodology to succeed.  
+  
+Accidentally some days I read an interesting post from Andrian about
+Rich Domain Tests at http://adrianhummel.wordpress.com/ and I decided to
+apply his idea.  
+After reading his post I got to the conclusion that one way to solve or
+at least minimize this unit-test-messy-code-problem was by using a
+fluent builder pattern to configure mock objects by using a builder
+whose interface could be describe how I am configuring a mock object
+with an interface closer to domain language.  
+  
+The unit test below is a rewritten from the example above with the
+concepts described here:  
+  
+
+``` prettyprint
+[Test]
+[ExpectedException(InvalidPaymentAgreementException)]
+public void PaymentAgreementMustNotBeCreatedWhenThePaymentOptionIsNotValidForTheDebtType()
+{
+  PaymentOption somePaymentOption = PaymentOptionMockBuilder
+                                    .Begin()
+                                    .BuildPaymentOption();
+
+  DebtType debtType = DebtTypeMockBuilder
+                      .Begin()  
+                      .AddPaymentOptionOf(somePaymentOption)
+                      .BuildDebtType();
+            
+  PaymentOption anotherPaymentOption = PaymentOptionMockBuilder
+                                       .Begin()
+                                       .BuildPaymentOption();          
+            
+  Debt debt = DebtMockBuilder
+              .Begin()
+              .WithDebtTypeOf(debtType)
+              .BuildDebt();
+
+  PaymentAgreement paymentAgreement = new PaymentAgreement(
+    new PaymentAgreementCreationParameter()
+    {
+      AgreementYear = SystemDate.Get().Value.Year,
+      AgreementNumber = 1,
+      AgreementCreationDate = SystemDate.Get().Value.Date,
+      NumberOfInstallments = 1,
+      AgreementValue = 100.0m,
+      Debts = new List &lt Debt &gt () { debt},
+      SelectedPaymentOption =  anotherPaymentOption
+    });
+
+}
+```
+
+  
+The fluent builder for Debt is DebtMockBuilder and can be programmed as
+follows:  
+  
+
+``` prettyprint
+    public class DebtMockBuilder
+    {
+        private Mock _debtMock;
+
+        public static DebtMockBuilder Begin()
+        {
+            DebtMockBuilder builder = new DebtMockBuilder();
+            builder._debtMock = new Mock();
+            return builder;
+        }
+
+        public Debt BuildDebt()
+        {
+            return _debtMock.Object;
+        }
+
+        public DebtMockBuilder WithDebtTypeOf(DebtType debtType)
+        {
+            this._debtMock.Setup(debt => debt.DebtType).Returns(debtType);
+            return this;
+        }
+    }
+```
+
+  
+PaymentOptionMockBuilder follows the same idea.  
+  
+Although I see that some improvements are needed I could see the
+following advantages from fluent mock builders:  
+  
+
+-   The test code was easier to understand because domain terms were
+    applied instead of specific API language.
+
+  
+  
+
+-   Specific mock framework calls were encapsulated which theoretically
+    can let programmers to use another mock framework in other projects
+    or using more than one mock framework in the same test (I dont know
+    why someone would do such a thing...).
+
+  
+  
+
+-   Finally mock configuration becomes more flexible since existing
+    methods don´t have to be modified to include new configuration but
+    only a new configuration method is needed. Thus mock configuration
+    can evolve as needed without loosing the domain interface.
+
+</div>

@@ -1,0 +1,184 @@
+---
+title: "Rich Domain Objects"
+author: "Humberto C Marchezi"
+date: "2008-03-19"
+categories: [software-engineering]
+---
+
+In object oriented programming, domain objects are the key of the
+software development. However, many programmers tend to write these
+classes as simple get/set storage just like the example below in
+pseudo-code:  
+
+``` brush:
+class Client
+{
+private long id;
+public string Id
+{
+get { return this.id; }
+set { this.id = value }
+}
+private string name;
+public string Name
+{
+get {return this.name; }
+set { this.name = value; }
+}
+
+private int registrationYear;
+public int RegistrationYear
+{
+get { return this.registrationyear; }
+set { registrationYear = value; }
+}
+}
+```
+
+  
+The instances of the class above are the so-called anemic-objects. These
+objects don't verify their internal state and their behavior and thus
+accept any value as input.  
+As a consequence the extra-work is delegated to the application.  
+  
+However these objects are not very practical for complex domain models
+and they don't take full power of the object programming. Classes not
+only carry data but also a functional part which are exactly the methods
+and properties.  
+  
+To attack complex domains there are rich domain objects which are
+objects capable of verifying all these aspects internally preventing the
+programmers from having to remember them later at the time of building
+the application.  
+  
+Rich domain objects help other developers not familiar with the business
+rules on how to create an application for that particular domain.  
+  
+In order to work efficiently with rich domain objects the following
+design rules can be adopted:  
+
+-   Constructors should contain required parameters to create a new
+    instance for the class from the business point of view
+
+  
+
+``` brush:
+// Rule 1 - Constructor with mandatory parameters
+public Client(name,registrationDate) {...}
+```
+
+  
+  
+
+-   Always use properties instead of accessing fields directly to read
+    or modify data in the class implementation except obviously in the
+    properties implementations
+
+  
+
+``` brush:
+// Rule 2 - Use properties instead of fields
+{ this.Name = name; this.RegistrationDate = registrationDate; }
+```
+
+  
+
+-   Set parameters should check the input parameters appropriately and
+    check the objects internal state before altering the object
+    according to the domain rules  
+
+  
+
+``` brush:
+public string Name
+{
+get {return this.name; }
+// Rule 3 - Set property checks the input value
+set { if (value == "") throw new SystemException("Empty name is invalid");
+this.name = value; }
+}
+```
+
+  
+
+-   Get parameters should check the object internal state before
+    returning a value
+
+  
+
+``` brush:
+public int RegistrationYear
+{
+//Rule 4-Get property checks object and application state before returning a value
+get
+{
+if (User.CurrentUser().IsManager())
+return this.registrationYear;
+else
+throw new SystemException("No permission for Client's Registration Year.");
+}
+set
+{
+if ((value <> DateTime.now.year))
+throw new SystemException("Year must be from 1980 until now");
+this.registrationYear = value; }
+}
+}
+```
+
+  
+
+-   Classes should be designed in order to follow primarily the business
+    model and then the data model
+
+  
+Following this rules a Client class could be:  
+
+``` brush:
+// Rule 5 - Client Class is designed according to the business model
+class Client
+{
+// Rule 1 - Constructor with mandatory parameters
+public Client(name,registrationDate)
+// Rule 2 - Use properties instead of fields
+{ this.Name = name; this.RegistrationDate = registrationDate; }
+
+private string id;
+public string Id
+{
+get { return this.id; }
+set { this.id = value; }
+}
+
+private string name;
+public string Name
+{
+get {return this.name; }
+// Rule 3 - Set property checks the input value
+set
+{
+if (value == "") throw new SystemException("Empty name is invalid");
+this.name = value;
+}
+}
+
+private int registrationYear;
+public int RegistrationYear
+// Rule 4-Get property checks object and application state before returning a value
+{
+get
+{
+if (User.CurrentUser().IsManager())
+return this.registrationYear;
+else
+throw new SystemException("No permission for Client's Registration Year.");
+}
+set
+{
+if ((value != DateTime.now.year))
+throw new SystemException("Year must be from 1980 until now");
+this.registrationYear = value;
+}
+}
+}
+```

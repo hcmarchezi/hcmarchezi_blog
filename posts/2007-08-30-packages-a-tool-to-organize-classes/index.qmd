@@ -1,0 +1,78 @@
+---
+title: "Packages: A Tool to Organize Classes"
+author: "Humberto C Marchezi"
+date: "2007-08-30"
+categories: [software-engineering]
+---
+
+One of these days I was taking to a work colleague about what should be
+the package (a.k.a. Namespace) of a certain class. Not rare there is a
+small debate about it. Should the class WorkerRiskActivity belong to the
+Health package or to the Activity package ? And so on ....  
+  
+Although it may sound a useless discussion it has been proven ( at least
+to our organization ) that this kind of worry is healthy specially in
+the long term.  
+  
+I can enumerate the following advantages in using good packages for
+classes:  
+  
+
+-   It breaks the complexity of hundreds of classes in blocs composed by
+    few classes just like folders for files.
+
+[<img src="http://4.bp.blogspot.com/_WHpubqoOAQY/SQyZN2CWskI/AAAAAAAAAog/CYr3mERWJPg/s400/Diagram1.png" id="BLOGGER_PHOTO_ID_5263750527612006978" />](http://4.bp.blogspot.com/_WHpubqoOAQY/SQyZN2CWskI/AAAAAAAAAog/CYr3mERWJPg/s1600-h/Diagram1.png)![](file:///C:/DOCUME%7E1/humberto/LOCALS%7E1/Temp/moz-screenshot.jpg)  
+
+-   It gives a clue for developer about what is the role of this class
+    in the
+    system.[<img src="http://3.bp.blogspot.com/_WHpubqoOAQY/SQybgvOSJLI/AAAAAAAAAoo/olw5VBq1gK0/s400/Diagram1.png" id="BLOGGER_PHOTO_ID_5263753051223762098" />](http://3.bp.blogspot.com/_WHpubqoOAQY/SQybgvOSJLI/AAAAAAAAAoo/olw5VBq1gK0/s1600-h/Diagram1.png)
+
+<div style="text-align: center;">
+
+The fully qualified name<span
+style="font-style: italic;">Finance.Sevices.DebtManagement </span>tell
+you what the class actually does.  
+
+</div>
+
+  
+
+-   It organizes the logic architecture of your software. This is
+    specially useful for layered architecture where the classes are
+    organized according to the class
+    role.[<img src="http://4.bp.blogspot.com/_WHpubqoOAQY/SQ3_ResPdvI/AAAAAAAAAqQ/KBDk39V0TI8/s400/blog.png" id="BLOGGER_PHOTO_ID_5264144215227463410" />](http://4.bp.blogspot.com/_WHpubqoOAQY/SQ3_ResPdvI/AAAAAAAAAqQ/KBDk39V0TI8/s1600-h/blog.png)
+
+Organizing classes can also be confusing. In order to avoid wrong
+classification, the following anti-patterns are listed below:  
+  
+
+-   Packages with vagues names  
+
+One of the traps that should be avoided is to create packages with too
+vague names such as <span style="font-style: italic;">General,
+</span><span style="font-style: italic;">Etc </span>or <span
+style="font-style: italic;">Miscellaneous. </span>This names are going
+to be used by lazy developers to place classes they don't want to think
+about how to classify to the right package.  
+  
+
+-   Too much debate about packages  
+
+  
+In the other hand, organizing classes in packages should not give rise
+to a long debate. If a class was placed in the wrong package, a code
+refactoring can solve the problem later.  
+
+-   Package-by-layer
+
+Although it can sound perfectly reasonable to have classes organized by
+layer. Actually this kind of packages can be harmful since it is no more
+possible determine what kind of permission a specific package can have
+since this package actually has all kinds of classes from varying parts
+of your system that don't relate to each other. The preferred way to use
+packages is to organize them by feature as it can be seen in all
+examples listed in this post. In fact this is not a "personal way" of
+modeling packages, this is the original purpose of a package.  
+Thus the package <span style="font-style: italic;">Finance</span> has
+all classes that compounds a financial application including its UI
+layer, services and the problem domain classes.

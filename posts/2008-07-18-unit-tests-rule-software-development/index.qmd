@@ -1,0 +1,32 @@
+---
+title: "Unit Tests Rule Software Development"
+author: "Humberto C Marchezi"
+date: "2008-07-18"
+categories: [software-engineering]
+---
+
+Even after a relatively long time using object oriented systems we still
+couldn't deal well with a growing problem. The lack of automated
+tests.  
+  
+The absence of unit tests reduce the programmers confidence about the
+system and makes it very difficult if not impossible to modify the
+source-code. Since each modification can cause a lot of other bugs and
+undesired side-effects in other parts of the system or in other systems,
+the system can not evolve with the changing business rules and the
+changing technological knowledge.  
+  
+Well that was true some months ago, now we are building a lot of unit
+tests for the systems already in production. Ironically due to some good
+architectural choices such as persistence isolation and POCO objects, it
+was not difficult to start testing with the Stub technique. It was all
+there, we just started creating test cases.  
+  
+In reality, although not the ideal way, a set of use-case tests are
+being implemented in order to assure the right execution of what was
+working before. So the service layer is tested not the business objects
+at this time.  
+  
+Now we are looking for automated ways to create mode real test cases in
+other to produce all the tests we need as fast as we can. Perhaps a
+testing framework will be necessary.

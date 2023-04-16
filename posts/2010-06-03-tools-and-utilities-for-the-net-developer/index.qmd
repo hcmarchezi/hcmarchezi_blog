@@ -1,0 +1,11 @@
+---
+title: "Tools and Utilities for the .NET Developer"
+author: "Humberto C Marchezi"
+date: "2010-06-03"
+categories: [software-engineering]
+---
+
+Here is a list I got from the internet that might be useful (at least
+for a while):  
+  
+http://geekswithblogs.net/mbcrump/archive/2010/05/25/tools-and-utilities-for-the-.net-developer.aspx

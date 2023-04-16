@@ -1,0 +1,18 @@
+---
+title: "My First Big Enterprise System with NHibernate"
+author: "Humberto C Marchezi"
+date: "2007-05-09"
+categories: [software-engineering]
+---
+
+We just finished to deliver our first big .NET system with a 4-Layered
+Architecture and domain objects. The proof-of-concepts is done also for
+big systems.  
+  
+Because we use a 4-Layered Architecture, the same business rules
+describe in the Task Layer (or Service Layer, as you wish) are applied
+to both the desktop and the web versions of the application.  
+  
+NHibernate has also proven its value showing that it has enough
+performance for any kind of systems. I am anxious to start building
+other layered object-oriented systems like this.

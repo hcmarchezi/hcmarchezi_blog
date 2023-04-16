@@ -1,0 +1,62 @@
+---
+title: "Unit Testing Linq Queries in Moq"
+author: "Humberto C Marchezi"
+date: "2010-02-22"
+categories: [software-engineering]
+---
+
+After some google research and experimentation I found that it was not
+worth to mock methods that return IQueryable or IQueryable because in
+order to use it programmers have to make use of extension methods. And
+this kind of methods are not supported by Moq ( a minimalistic mock
+framework ). This is the DAO interface I want to test.
+
+``` prettyprint
+public interface IDAOFactory
+{
+  public abstract IQueryable Query();
+}
+```
+
+This is the moq unit test that fails, since I can´t use Linq directly.
+
+``` prettyprint
+[Test]
+public void LinqQueryTest()
+{ 
+  // This moq configuration will trigger an exception – Can´t make use of extension methods
+  daoFactoryMock.Setup(d => (from o in d.Query()
+    where o.Id >= 0
+    select o.Id).ToList())
+    .Returns( new List() { 1, 2 } );
+}
+```
+
+It turns out that the solution is easily solved by using a collection as
+a data source.
+
+``` prettyprint
+[Test]
+public void LinqQueryTest()
+{
+  // Creates a IQueryable from a Collection
+  IList lstOrders = new List() { 
+    orderMock1.Object, 
+    orderMock2.Object, 
+    orderMock3.Object };
+  IQueryable orderQuery = lstOrders.AsQueryable();
+
+  // Configures the Query to return IQueryable implementation
+  daoFactoryMock.Setup(d => d.Query()).Returns(orderQuery);
+
+  // Now the linq queries can be used naturally 
+  IList lstResult = (from o in daoFactoryMock.Object.Query() where o.Id >= 0 Select o).ToList();
+
+  // Checking output results
+  Assert.AreEqual(3, lstResult.Count);
+}
+```
+
+It is important to notice that the collection elements that should also
+be mock objects must contain all the necessary data in order to make the
+correct test.

@@ -1,0 +1,60 @@
+---
+title: "Agile Modeling in Software Projects"
+author: "Humberto C Marchezi"
+date: "2009-06-13"
+categories: [software-engineering]
+---
+
+Recently Jeff Sutherland mentioned another certification for software
+programmers since Scrum does not include software engineer techniques
+but very present in XP (extreme programming) management. That is
+probably the reason why many software developers work with Scrum and XP
+methodologies together.  
+  
+However although XP is very software-programming oriented it is still
+not enough to have a good software design in large systems projects.
+Additionally in many organizations it is very difficult to find a
+product owner that fully understand the business rules and can manage
+the software functionalities.  
+  
+In order to efficiently use Scrum, there must be someone responsible for
+understanding the business. If there is no product owner, one employee
+must be chosen to study and logically model the business. That is
+exactly why a good business modeling is imperative before any large
+software development.  
+  
+Good software design and business understanding prevents or reduces
+significantly re-work tasks. It is considered wasted work since these
+tasks do not devliver anything useful to the client and often happens
+when developers did not captured well the business rules.  
+  
+Thus the following software development process is proposed to match DDD
+and agile approach. In this software process, there can be product
+owners, developers and scrum masters just like original Scrum the
+difference is that before the sprints (see Scrum reference) can start, a
+long DDD session is necessary in order to produce a good business
+model.  
+  
+Briefly describing the following steps should be taken:  
+  
+
+1.  A selected person assumes the role of Product Owner
+2.  Product Owner becomes responsible for studying and building a
+    business model  
+3.  Product Owner writes all the system features using User Stories
+    (from XP)
+4.  Product Owner schedules a Planning Meeting with the Scrum Master and
+    Developers to present User Stories and the Business Model
+5.  Scrum Master schedules a Sprint Meeting with developers to plan the
+    Next Sprint based on the Stories
+6.  Developers begin the Sprint (from 1 to 2 weeks)
+7.  Scrum Master Organizes Daily Meetings with Developers (just like
+    Scrum)
+8.  At the end of the Spring, Scrum Master schedules a Weekly Meeting to
+    present the system to the Product Owner but it also includes the
+    developers of the project who makes considerations about the system
+    presented
+9.  Scrum Master organized a Retrospective Meeting with the developers
+    to discuss what went wrong or right with the Sprint and then they
+    start planning the next Sprint.
+10. Go to Step 6 until Product Owner gets satisfied  

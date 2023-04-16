@@ -1,0 +1,77 @@
+---
+title: "iPhone Development: to Objective-C or not to Objective-C ?"
+author: "Humberto C Marchezi"
+date: "2011-02-27"
+categories: [software-engineering]
+---
+
+When I think of Objective-C, what comes to my mind is a niche
+programming language for the MacOS and Apple related products. Thus as
+far as I know this is the only officially supported language to develop
+products for iPhones, iPods, iPads and so on ....  
+On the other hand I really what to develop apps that will work in
+Windows, Linux and MacOS, and for this purpose I see two options:  
+  
+**1) Develop in C/C++ and try to find tools that translate this code to
+Objective-C and/or MacOS**  
+  
+**2) Use Objective-C to develop any kind of application (at least
+desktop and mobile apps)**  
+  
+
+Developing portable iPhone apps outside Objective-C
+---------------------------------------------------
+
+  
+
+### Swig
+
+For the first option, there is swig ( http://www.swig.org/ ) which is a
+wrapper for C++ to export its classes and/or functions to several
+languages (Objective-C is a work in progress).  
+However it doesn´t really solve the problem because there are
+libraries.  
+  
+
+### Mono Touch
+
+The Mono Touch ( http://monotouch.net/ ) is probably one of the most
+interesting project to develop apps for the iPhone without Objective-C.
+It makes it possible to develop apps with C\#.NET. The same Mono project
+also make it possible to develop apps for Linux. As a consequence,
+C\#.NET could be seriously considered to develop apps for a wide range
+of platforms. However unlike Mono one must pay to start using it which
+may not be a problem if you are familiarized with C\#.NET.  
+  
+
+### PhoneGap
+
+Another options is PhoneGap ( http://www.phonegap.com ) which is an
+open-source framework whose objective is to let developers to write apps
+with HTML5+CSS+JavaScript and execute it to the different mobile
+platforms including iOS.  
+  
+
+Objective-C as a portable programming language
+----------------------------------------------
+
+  
+I recently read about he mechanics and philosophy of Objective-C
+language and I got quite impressed by its features. It is not just C
+with classes as I heard before, it is actually a powerful dynamic
+language. Everything is an object including the classes itself what
+reminds me of Smalltalk, LISP and Python.  
+  
+There are also some options to use Objective-C outside of the Apple
+ecosystem:  
+  
+
+### GNU Step
+
+As stated in their website ( http://www.gnustep.org/ ) the objective is
+to create an open version of Cocoa (former NextStep) for several
+platforms including Linux and Windows.  
+  
+Besides porting the API this project also comes with several developer
+tools such as an IDE named **ProjectCenter** and a GUI code generator
+called **Gorm**.

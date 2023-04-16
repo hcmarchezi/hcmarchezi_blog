@@ -1,0 +1,33 @@
+---
+title: "5 Things You Should Remember about NHibernate"
+author: "Humberto C Marchezi"
+date: "2008-07-18"
+categories: [software-engineering]
+---
+
+NHibernate is probably the most used ORM (object-relational mapping
+tool) for .NET applications and it is based in Hibernate the most used
+ORM in Java for years.  
+The learning curve to start working with NHibernate can be reduced if
+you remember the take the following steps:  
+  
+1) The domain class should have at least one <span
+style="font-weight: bold;">public</span> or <span
+style="font-weight: bold;">protected</span> <span
+style="font-weight: bold;">parameterless</span> <span
+style="font-weight: bold;">constructor</span>  
+  
+2) The domain classes' public properties and methods must declared with
+the <span style="font-weight: bold;">virtual</span> reserved word  
+  
+3) For XML mappings, remember to rename your mapping files ending with
+<span style="font-weight: bold;">\*.hbm.xml</span> not only <span
+style="font-weight: bold;">\*.xml</span>  
+  
+4) Also for XML mappings, remember to set the property of each file to
+<span style="font-weight: bold;">embedded resource</span> instead of
+content  
+  
+5) Avoid using<span style="font-weight: bold;"> composite-id's</span>
+classes as much as you can since they don't work very well when used in
+cascade collections and they make development more difficult

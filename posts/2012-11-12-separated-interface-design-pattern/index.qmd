@@ -1,0 +1,94 @@
+---
+title: "Separated Interface Design Pattern"
+author: "Humberto C Marchezi"
+date: "2012-11-12"
+categories: [software-engineering]
+---
+
+<div dir="ltr" style="text-align: left;" trbidi="on">
+
+  
+
+****<span style="font-family: Arial; font-size: 15px; vertical-align: baseline; white-space: pre-wrap;">When developing a system in many cases it is possible to identify dependencies among different layers whose responsibilities are well defined in the system.</span>****
+===============================================================================================================================================================================================================================================================================
+
+**<span
+style="font-family: Arial; font-size: 15px; vertical-align: baseline; white-space: pre-wrap;">Some
+examples of layer dependencies are:</span>  
+**
+
+-   <span
+    style="vertical-align: baseline; white-space: pre-wrap;">Controller
+    layer dependency and UI layer</span>
+-   <span
+    style="vertical-align: baseline; white-space: pre-wrap;">Domain
+    logic layer and persistence layer</span>
+
+<span
+style="font-family: Arial; font-size: 15px; vertical-align: baseline; white-space: pre-wrap;"></span>  
+<span
+style="font-family: Arial; font-size: 15px; vertical-align: baseline; white-space: pre-wrap;">One
+strategy to remove dependencies between layers is to use the separated
+interface design pattern. This pattern consists of defining an interface
+from the bottom layer that is going to be used by the top layer. See
+diagram below  to understand how it works for controller and UI
+layer:</span>  
+<span
+style="font-family: Arial; font-size: 15px; vertical-align: baseline; white-space: pre-wrap;"></span><img src="https://docs.google.com/drawings/image?id=sCc_ncfu15Z_cXf4Jx28UdQ&amp;w=589&amp;h=468&amp;rev=316&amp;ac=1" /><span
+style="font-family: Arial; font-size: 15px; vertical-align: baseline; white-space: pre-wrap;"></span>  
+<span
+style="font-family: Arial; font-size: 15px; vertical-align: baseline; white-space: pre-wrap;"></span>  
+<span
+style="font-family: Arial; font-size: 15px; vertical-align: baseline; white-space: pre-wrap;">The
+controllers in the example above only reference interface views and
+never know which view implementation they are actually working
+with.</span>  
+<span
+style="font-family: Arial; font-size: 15px; vertical-align: baseline; white-space: pre-wrap;"></span>  
+<span
+style="font-family: Arial; font-size: 15px; vertical-align: baseline; white-space: pre-wrap;">This
+design pattern is recommended for a system when:</span>  
+
+-   <span style="vertical-align: baseline; white-space: pre-wrap;">One
+    layer (such as a controller) will be reused to be plugged into
+    different versions of the other layer (such as HTML5 and native view
+    layer implementations)</span>
+-   <span
+    style="vertical-align: baseline; white-space: pre-wrap;">Layers are
+    easier to be tested in isolation</span>
+-   <span style="vertical-align: baseline; white-space: pre-wrap;">It is
+    not desired that one layer has API dependencies from the other
+    layer</span>
+
+<span
+style="font-family: Arial; font-size: 15px; vertical-align: baseline; white-space: pre-wrap;"></span>  
+<span
+style="font-family: Arial; font-size: 15px; font-weight: bold; vertical-align: baseline; white-space: pre-wrap;">References:</span>  
+
+-   <span
+    style="vertical-align: baseline; white-space: pre-wrap;">Martin
+    Fowler, Patterns of Enterprise Application Architecture, Separated
+    Interface, Pages 475-479</span>
+-   <span
+    style="vertical-align: baseline; white-space: pre-wrap;">Separated
+    Interface, </span>[<span
+    style="color: #1155cc; vertical-align: baseline; white-space: pre-wrap;">http://martinfowler.com/eaaCatalog/separatedInterface.html</span>](http://martinfowler.com/eaaCatalog/separatedInterface.html)<span
+    style="vertical-align: baseline; white-space: pre-wrap;"></span>
+-   <span
+    style="vertical-align: baseline; white-space: pre-wrap;">Developing
+    Software for Multi Mobile Devices, </span>[<span
+    style="color: #1155cc; vertical-align: baseline; white-space: pre-wrap;">http://martinfowler.com/articles/multiMobile/</span>](http://martinfowler.com/articles/multiMobile/)<span
+    style="vertical-align: baseline; white-space: pre-wrap;"></span>
+
+<span
+style="font-family: Arial; font-size: 15px; vertical-align: baseline; white-space: pre-wrap;"></span>  
+<span
+style="font-family: Arial; font-size: 15px; vertical-align: baseline; white-space: pre-wrap;"></span>  
+<span
+style="font-family: Arial; font-size: 15px; vertical-align: baseline; white-space: pre-wrap;"></span>  
+<span
+style="font-family: Arial; font-size: 15px; vertical-align: baseline; white-space: pre-wrap;"></span>  
+<span
+style="font-family: Arial; font-size: 15px; vertical-align: baseline; white-space: pre-wrap;"></span>
+
+</div>

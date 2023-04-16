@@ -5,27 +5,59 @@ date: "2006-10-28"
 categories: [software-engineering]
 ---
 
-
-As far as I know OO has existed since the 70's. For a long time, OO was mainly used for academic projects. In the meantime relational databases gained popularity between comercial computer systems and so the relational model.
-The relational model has also evolved gained popularity since it presented a concrete solution to the problem of how to store data of a business model.
-
-With the rise of Java Programming Language, OO became much popular since it motivates the programmer to use this paradigm.
-
-One of the most important characteristics of the OO paradigm for enterprise applications is that the data and the functional aspects of a business model could be abstracted. Thus OO paradigm offers a higher level of abstraction compared to the relational model however that didnn't turn itself into a practical advantage for comercial system.
-
-Relational Databases are responsible for almost all data storage in computer systems while OO Databases ( not talking about Object-Relational Databases like Oracle ) are not sufficiently mature yet and although it was easier to build more complex software an old problem still persisted which is the OO paradigm and the relational model mistmatch problem deeply explored by Scott W Ambler.
-( http://www.agiledata.org/essays/impedanceMismatch.html )
-
-This impedance mismatch use to consume a lot of time from OO programmers. For example, a line in a Person table in a relational model is represented as a Person object. Before in order to do that OO programmers had to program a persistence layer by hand. Besides time consuming it was also a complex task. These reasons were enough to put OO away from the comercial software market for several years.
-
-The Object-Relational-Mapping Tools (ORM Tools ) addressed this issue more productive way. With these tools the columns of a table in the relational model were mapped to an attribute in a class in the OO model. These mappings can be done in a XML file, in a separate class or by using annotations. The most stable and well-documented so far is Hibernate.
-( www.hibernate.org )
-
-Whatever these mappings are described these tools made it possible to use OO in Enterprise Applications Projects. It was not necessary to spend so long time to implement object persistence and it was also possible to use OO in legacy relational databases.
-
-There are even tools that generate the class code in Java or .NET and the mapping code from the database schema like MyGeneration.
-( http://www.mygenerationsoftware.com/portal/default.aspx )
-
-Interestingly there lot of articles out there saying that there is no evidence proving that the OO approach is a an advantage over the relational programming and not a long time ago some authors used to say that OO in Enterprise Applications was something impossible.
-
-In my opnion OO offers advantage in a long term since the business model is gradually represented with a higher level of abstraction.
+As far as I know OO has existed since the 70's. For a long time, OO was
+mainly used for academic projects. In the meantime relational databases
+gained popularity between comercial computer systems and so the
+relational model.  
+The relational model has also evolved gained popularity since it
+presented a concrete solution to the problem of how to store data of a
+business model.  
+  
+With the rise of Java Programming Language, OO became much popular since
+it motivates the programmer to use this paradigm.  
+  
+One of the most important characteristics of the OO paradigm for
+enterprise applications is that the data and the functional aspects of a
+business model could be abstracted. Thus OO paradigm offers a higher
+level of abstraction compared to the relational model however that
+didnn't turn itself into a practical advantage for comercial system.  
+  
+Relational Databases are responsible for almost all data storage in
+computer systems while OO Databases ( not talking about
+Object-Relational Databases like Oracle ) are not sufficiently mature
+yet and although it was easier to build more complex software an old
+problem still persisted which is the OO paradigm and the relational
+model mistmatch problem deeply explored by Scott W Ambler.  
+( http://www.agiledata.org/essays/impedanceMismatch.html )  
+  
+This impedance mismatch use to consume a lot of time from OO
+programmers. For example, a line in a Person table in a relational model
+is represented as a Person object. Before in order to do that OO
+programmers had to program a persistence layer by hand. Besides time
+consuming it was also a complex task. These reasons were enough to put
+OO away from the comercial software market for several years.  
+  
+The Object-Relational-Mapping Tools (ORM Tools ) addressed this issue
+more productive way. With these tools the columns of a table in the
+relational model were mapped to an attribute in a class in the OO model.
+These mappings can be done in a XML file, in a separate class or by
+using annotations. The most stable and well-documented so far is
+Hibernate.  
+( www.hibernate.org )  
+  
+Whatever these mappings are described these tools made it possible to
+use OO in Enterprise Applications Projects. It was not necessary to
+spend so long time to implement object persistence and it was also
+possible to use OO in legacy relational databases.  
+  
+There are even tools that generate the class code in Java or .NET and
+the mapping code from the database schema like MyGeneration.  
+( http://www.mygenerationsoftware.com/portal/default.aspx )  
+  
+Interestingly there lot of articles out there saying that there is no
+evidence proving that the OO approach is a an advantage over the
+relational programming and not a long time ago some authors used to say
+that OO in Enterprise Applications was something impossible.  
+  
+In my opnion OO offers advantage in a long term since the business model
+is gradually represented with a higher level of abstraction.

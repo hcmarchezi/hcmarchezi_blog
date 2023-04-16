@@ -1,0 +1,51 @@
+---
+title: "Extreme Programming Impressions"
+author: "Humberto C Marchezi"
+date: "2009-09-27"
+categories: [software-engineering]
+---
+
+Whe I first read about XP Programming in 2002 (
+http://www.extremeprogramming.org/ ) which is one of the agile
+methodologies for software development I didn't take it seriously.  
+At that time the authors of this methodology were saying that software
+didn´t need to be documented, models were not necessary or useful at
+all, people should be the documentation of the software, etc.  
+Immediately it came to my mind that it couldn´t work for many small (and
+big) software companies due to several problems:  
+  
+– Software companies are constantly loosing and hiring workforce so how
+can they work if they keep loosing “documentation” which is on people´s
+minds ?  
+  
+– How can they know the "what", "where" and "how" in the source code ?  
+  
+Some years have passed and this methodology has matured and besides that
+other good methodologies of the same family like Scrum have come up
+too.  
+It called my attention that many state-of-art tech companies like Google
+and Yahoo! were working with Scrum and I started to get curious to know
+what it is about.  
+  
+Five years later I decided to attend to a presentation about XP
+Programming in order to get a broader picture about it. It helped me to
+remove some miths I had such as the lack of documentation. Actually the
+Agile Methodology do not remove the activity of producing documentation
+but it just gave a different meaning for the documentation. The
+documentation should be provided if relevant for developers. It doesn´t
+have to include fancy diagrams but only the necessary information such
+as what is the system about, how to compile source-code, or other
+information that it is not self-explained in the system.  
+  
+After reading "The Toyota Way" I noticed that agile methodologies was
+greatly inspired by this administration model. This model is basically
+driven to reduce waste, in other words, we should do only the necessary
+to accomplish our objectives, no more or no less. By reducing waste we
+are also reducing unnecessary work what can mean different things
+depending on our project such as no documentation, few documentation, no
+models, etc.  
+  
+Therefore to be lean (and consequently agile), one must think on what
+tasks are been carried out and what tasks in the process should be
+eliminated if they have no value. Read the book above to have a good
+idea of the process.

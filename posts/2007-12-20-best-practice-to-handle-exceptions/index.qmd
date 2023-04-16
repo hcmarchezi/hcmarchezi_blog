@@ -1,0 +1,89 @@
+---
+title: "Best Practice to Handle Exceptions"
+author: "Humberto C Marchezi"
+date: "2007-12-20"
+categories: [software-engineering]
+---
+
+Modern programming languages come with try/catch/finally blocks and many
+times an Exception Hierarchy of classes is provided also.  
+Exceptions are a powerful tool that can be used to handle both system
+and user errors.  
+When exceptions are thrown in some part of the code, the system keeps
+popping ( removing the head ) of the stack until it finds a catch
+statement that can handle that exception type.  
+One common way to capture exceptions is to write several catches from
+the most specific to the most generic exception class until you can
+capture the exception type appropriately according to its type.  
+Check code below:  
+
+    try
+    {
+      // code block
+    }
+    catch ( SpecialSystemException e)
+    {
+      // code to handle SpecialSystemException  
+    }
+    catch ( SystemException e)
+    {
+      // code to handle SystemException
+    }
+    catch ( Exception e)
+    {
+      // code to handle Exception
+    }
+    finally
+    {
+      // finishes code block
+    }
+
+  
+  
+However in many cases it is desired to treat each exception same way
+according to its type in the entire system. In this case the code
+template shown above has some disadvantages:  
+
+-   Programmers must write more code to implement try/catch/finally code
+    blocks to due the several "catch" statements for each exception type
+    that is intended to treat
+-   Code to treat exception classes are replicated in the software
+    code  
+-   And finally if it demands more work and it is repeated than it is
+    error prone
+
+In order to solve this problem a better approach is to create a separate
+centralized class to treat all exceptions thrown from the system
+internally. Like the .NET pseudo-code example below:  
+
+    public class ExceptionHandler
+    {
+      public static void Handler(Exception exception)
+      {
+        if (exception.GetType() == typeof(SpecialSystemException))
+        {
+          // Code that deals with SpecialSystemException 
+        }   
+        else if (exception.GetType() == typeof(SystemException))
+        { 
+          // Code that deals with SystemException
+        }
+      else if (exeception.GetType() == typeof(Exception))
+      {
+          // Code that deals with Exception
+        }
+    }
+
+  
+  
+Replacing the code of the first example:  
+
+    try
+    {
+      // code block
+    }
+    catch ( Exception e)
+    {
+      // Exceptions are now treated internally by the method below
+      ExceptionHandler.Handler(exception);
+    }

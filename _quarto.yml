@@ -15,5 +15,7 @@ format:
     theme: cosmo
     css: styles.css
 
-
+comments:
+  giscus: 
+    repo: hcmarchezi/hcmarchezi.github.io
 

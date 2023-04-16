@@ -1,0 +1,48 @@
+---
+title: "Publishing ClickOnce winforms applications with command-line MSBuild"
+author: "Humberto C Marchezi"
+date: "2011-02-27"
+categories: [software-engineering]
+---
+
+One of the most interesting characteristics of tools such as CCNet and
+Nant is the automated deploy. I found many examples of how to publish an
+application with pre-configured projects with click-one but I wanted to
+do it different. In order to make the project file cleaner the approach
+was to remove all click-once configurations from the project(\*.csproj)
+so that command-line MSBuild will take care of publication configuration
+in a NAnt script. After some full-days of research, I found the solution
+below. I hope it helps in your project.
+
+``` prettyprint
+<exec program="${dotnetFrameworkDir}\MSBuild.exe">
+  <arg value="${basePath}\MyProject\MyProject.csproj"></arg>
+  <arg value="/target:publish"></arg>
+  <arg value="/p:IsWebBootstrapper=true"></arg>
+  <arg value="/p:SignManifests=true"></arg>
+  <arg value="/p:ManifestKeyFile=${basePath}\MyProject\MyCertificate.pfx"></arg>
+  <arg value="/p:TargetZone=LocalIntranet"></arg>
+  <arg value="/p:GenerateManifests=true"></arg>
+  <arg value="/p:PublishUrl=${clickOnceDir}"></arg>
+  <arg value="/p:Install=true"></arg>
+  <arg value="/p:InstallFrom=Web"></arg>
+  <arg value="/p:UpdateEnabled=true"></arg>
+  <arg value="/p:UpdateRequired=true"></arg>
+  <arg value="/p:InstallUrl=http://myPublishUrlAddress"></arg>
+  <arg value="/p:TargetCulture=pt-BR"></arg>
+  <arg value="/p:ProductName=MyProject"></arg>
+  <arg value="/p:PublisherName=MyCompany"></arg>
+  <arg value="/p:MinimumRequiredVersion=${CCNetLabel}"></arg>
+  <arg value="/p:CreateWebPageOnPublish=true"></arg>
+  <arg value="/p:WebPage=${webPage}"></arg>
+  <arg value="/p:OpenBrowserOnPublish=false"></arg>
+  <arg value="/p:ApplicationRevision=17"></arg>
+  <arg value="/p:ApplicationVersion=${CCNetLabel}"></arg>
+  <arg value="/p:CreateDesktopShortcut=true"></arg>
+  <arg value="/p:PublishWizardCompleted=true"></arg>
+  <arg value="/p:BootstrapperComponentsLocation=Absolute"></arg>
+  <arg value="/p:BootstrapperComponentsUrl=${bootstrapperUrl}"></arg>
+  <arg value="/p:GenerateBootstrapperSdkPath=${pathBootStrapper}"></arg>
+  <arg value="/p:UpdateUrlEnabled=false"></arg>
+</exec>
+```

@@ -1,0 +1,67 @@
+---
+title: ".NET: Using Generics to avoid repetition in Domain Classes"
+author: "Humberto C Marchezi"
+date: "2009-03-14"
+categories: [software-engineering]
+---
+
+In classical object oriented methodologies or new-old-ones such as
+Domain Driven Design, the domain layer classes have persistent methods
+that reference its correpondent repository.  
+Generally this is the format:  
+
+    public class SomeDomainClass
+    {
+    public SomeDomainClass(string description) { ... }
+
+    private long _id;
+    public long Id { set {...} get{...} }
+    private string _description;
+    public string Description { set{...} get{...} }
+
+    private static ISomeDomainClassRepository repository = RepositoryFactory.Get();
+
+    public void Save() { repository.Save(this); }
+    public void Remove() { repository.Remove(this); }
+    public static SomeDomainClass GetById(long id) { return repository.GetById(id); }
+    public static IList GetByDescriptionPart(string descriptionPart) 
+    { return repository.GetBydescriptionPart(descriptionPart); }
+
+    }
+
+  
+  
+If by convention we define Id property, Save, Remove and GetById methods
+as default methods.  
+Then they will repeat for every Domain class. In .NET we can avoid this
+problem with generic programming:  
+  
+
+    public class PersistentBase where classType:class
+    {
+    private idType _id;
+    public idType Id { protected set { this._id = value; } get { return this._id; } }
+
+    private static iRepositoryInterface repository = Repository.GetRepository();
+
+    public void Save() { repository.Save(this); }
+    public void Remove() { repository.Remove(this); }
+    public static classType GetById(idType id) { return repository.GetById(id); }   
+    }
+
+  
+  
+Thus, with the help of the PersistentBase, SomeDomainClass would be:  
+
+    public class SomeDomainClass : PersistentBase
+    {
+    public SomeDomainClass(string description) { ... }
+
+    private string _description;
+    public string Description { set{...} get{...} }
+
+    // Only specific data method will remain
+    public static IList GetByDescriptionPart(string descriptionPart) 
+    { return repository.GetBydescriptionPart(descriptionPart); }
+
+    }

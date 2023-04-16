@@ -1,0 +1,201 @@
+---
+title: "JavaScript: Object Oriented Programming"
+author: "Humberto C Marchezi"
+date: "2011-08-28"
+categories: [software-engineering]
+---
+
+By using functions and the structures above it is possible to a function
+object which syntax works just like a C++/Java class. See examples
+below.
+
+Classes
+-------
+
+In JavaScript classes are declared as functions.
+
+``` prettyprint
+function Task(name,dueDate)
+{
+    this.name = name;
+    this.dueDate = dueDate;
+};
+var myTask = new Task("Clean house","2011-07-01");
+myTask.name = "some new name";
+```
+
+Methods
+-------
+
+Methods are declared by extending the function prototype.
+
+``` prettyprint
+var User = function(email,password) {
+    this.email = ""; // public field
+    this.password = "";
+};
+User.prototype.generatePassword = function() {  // public method
+    this.password = "generatedpass";
+}
+var user = new User("you@email.com","mypassword");
+user.generatePassword(); // password is generatedpass
+```
+
+Alternatively methods can be declared inside the function declaration.
+
+``` prettyprint
+var User = function(email,password) {
+    this.email = "";
+    this.password = "";
+    this.generatePassword = function() { 
+        this.password = "generatedpass";
+    };
+};
+```
+
+Inheritance
+-----------
+
+In order to make a class inherit from another class, the subclass
+prototype must be set to the desired parent object. It is also necessary
+to set the constructor as the current class which is a little od. See
+example below.
+
+``` prettyprint
+function Person() {
+    this.firstname = "James";
+};
+Person.prototype.generateName = function() {
+    this.firstname = "generatedname";
+};
+
+function Student() {
+    this.school = "Rahway School";
+};
+Student.prototype = new Person();
+Student.prototype.constructor = Student;
+Student.prototype.setBestSchool = function() {
+    this.school = "Best school in town";
+};
+```
+
+Polymorphism
+------------
+
+Polymorphism can be achieved by simply declaring methods with the same
+name. Consider the hierarchy of figures as an example below.
+
+``` prettyprint
+function Photo() {    
+}
+Photo.prototype.getDestinationPath = function() { 
+    return "./photos/common";
+};
+function PartyPhoto() {
+}
+PartyPhoto.prototype = new Photo();
+PartyPhoto.prototype.constructor = PartyPhoto;
+PartyPhoto.prototype.getDestinationPath = function() {
+    return "./photos/parties";
+};
+
+photo = new Photo();
+photo.getDestinationPath(); // path for common photos
+
+partyPhoto = new PartyPhoto();
+partyPhoto.getDestinationPath(); // path for party photos
+```
+
+Encapsulation
+-------------
+
+In the examples above all attributes and methods were public. In order
+to declare private attributes or methods one solution is to follow the
+template code below: (taken from
+http://www.codeproject.com/KB/scripting/jsoops.aspx )
+
+``` prettyprint
+function MyClass(){    
+    //Private members
+    return{
+        //Public members
+    }}
+```
+
+An App class can be implemented as:
+
+``` prettyprint
+function App(appname,description) {
+    var _name = appname;
+    var _description = description
+    return {
+        getName: function() { return _name; },
+        getDescription: function() { return _description; },
+        setName: function(appname) { _name = appname; },
+        setDescription: function(description) { _description = description; }
+    };    
+}
+var myApp = new App("voila","my game");
+var.setName("other game");
+```
+
+Please note that this approach does not offer a way to have
+encapsulation and inheritance at the same time. Read next section to
+know one way to achieve this.
+
+Inheritance with Encapsulation
+------------------------------
+
+By experimenting with the approach above, I found out a different way
+that made it possible to have both encapsulation and inheritance in
+JavaScript. The idea is to declare private members as function variables
+as above and then augment the parent object with the desired public
+functions. Thus it is not necessary to work with prototypes. Take the
+generic Person class as an example:
+
+``` prettyprint
+function Person(name) {
+    // Private Members
+    var _name = "";
+    // Public Members (accesses private members)
+    var obj = new Object();
+    obj.setName = function(name) { _name = name; };
+    obj.getName = function() { return _name;  };  
+    // Constructor
+    obj.setName(name);
+    return obj;
+};
+```
+
+A person instance will have access to getName and SetName but not \_name
+attribute and therefore we have encapsulation. For a Student class that
+inherits from Person, the code would be:
+
+``` prettyprint
+function Student(name,school) {
+    // Private Members
+    var _school = "";
+    // Creating parent object: Studen inherits from Person
+    var parent = new Person(name);
+    // Augmenting parent object with Student methods
+    parent.setSchool = function(school) { _school = school; };
+    parent.getSchool = function() { return _school; };
+    // Constructor Logic (Initialization)
+    parent.setSchool(school);
+    return parent;
+};
+```
+
+These functions can be used just like normal classes:
+
+``` prettyprint
+var person = new Person("James");
+person._name; // undefined
+person.getName(); // James
+
+var student = new Student("Jack","Orange City School");
+student._name;        // undefined
+student.getName();  // Jack
+student._school;       // undefined
+student.getSchool(); // Orange City School
+```
