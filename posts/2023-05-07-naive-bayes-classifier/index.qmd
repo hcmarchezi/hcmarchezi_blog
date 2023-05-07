@@ -1,0 +1,130 @@
+---
+title: "Text Classification with Naive Baye's"
+author: "Humberto C Marchezi"
+date: "2023-05-07"
+categories: [machine-learning]
+---
+
+## Introduction
+In the context of NLP (natural language processing), Baye's rule is given by:
+$P(category | word) = P(word | category) * P(category) / P(word)$
+
+where:
+
+* $P(category | word)$: probability of a category given a word 
+* $P(word | category)$: probability of word given category 
+* $P(category)$: probability of a category to occur
+* $P(word)$: probability of a word to occur
+
+For a sequence of words, the formula becomes:
+
+$P(category | word_0, word_1, ..., word_n) = P(category) * \frac{P(word_0 | category) * P(word_1 | category) * ... * P(word_n | category)}{P(word_0) * P(word_1) * ... * P(word_n)}$
+
+## Basic Idea
+Naive Baye's programming is composed by the following steps:
+1. count word frequency by category 
+
+For example, when classifying statements between categories: **Positive** and **Negative**:
+
+Given the statements:
+
+* **positive**: *The happy fox*
+* **negative**: *The dead fox*
+* **positive**: *Fox is happy*
+* **negative**: *Fox is dead*
+
+1. count word frequencies per category
+
+*word table:*
+
+word      | positive | negative 
+--------- | --------- | ---------
+the       | 1        | 1
+fox       | 2        | 2
+happy     | 2        | 0
+dead      | 0        | 2
+is        | 1        | 1
+**TOTAL** | **6**    | **6**       
+
+2. compute table of probabilities
+
+word | pos_probability  | neg_probability
+---- | ---------------- | -------------------
+the  | 1/6 = 0.1666     | 1/6 = 0.1666
+fox  | 2/6 = 0.3333     | 2/6 = 0.3333
+happy| 2/6 = 0.3333     | 0/6 = 0
+dead | 0/6 = 0          | 2/6 = 0.3333
+is   | 1/6 = 0.1666     | 1/6 = 0.1666    
+
+3. compute likelihood of a statement
+
+**query statement example:** Is fox happy ?
+
+$$
+\prod_{i=1}^{m} \frac{P(w_i|positive)}{P(w_i|negative)}=
+\frac{P(is|positive)*P(fox|positive)*P(happy|positive)}{P(is|negative)*P(fox|negative)*P(happy|negative)}=
+\frac{0.1666*0.3333*0.3333}{0.1666*0.3333*0}=
+$$
+
+replacing **0** in the formula above for a very small number as a temporary solution before we can later learn about *Laplacian Smoothing*:
+
+$$
+\frac{0.1666*0.3333*0.3333}{0.1666*0.3333*0.0001}=10000
+$$
+
+**10000 > 1** therefore the statement is classified as **positive**
+
+## Laplacian Smoothing
+Avoids the problem of handling words with 0 frequency in one of the classes in the step *2* above when calculating word class probability.
+Note the words *happy* and *dead* in the example above.
+
+$$
+P(w_i|class)=\frac{freq(w_i, class)+1}{N_{class}+V}
+$$
+
+where:
+
+* $w_i$: $i^{th}$ word from the training data
+* $class$: the category class
+* $N_{class}$: number of categories
+* $V$: number of unique words in vocabulary
+
+## Log Likelihood
+Avoids the problem of underflow (too small number) as a result of long multiplication of probabilities:
+
+$$
+log( a * b * c ) = log(a) + log(b) + log(c)
+$$
+
+**Original Solution**
+
+$$
+\prod_{i=1}^{m} \frac{P(w_i|positive)}{P(w_i|negative)}=
+\frac{P(is|positive)*P(fox|positive)*P(happy|positive)}{P(is|negative)*P(fox|negative)*P(happy|negative)}=
+\frac{0.1666*0.3333*0.3333}{0.1666*0.3333*0}
+$$
+
+**Log Solution with Non-Zero Correction**
+
+$log( \prod_{i=1}^{m} \frac{P(w_i|positive) + 1}{P(w_i|negative) + 1} )=\sum_{i=1}^{m} log(\frac{P(w_i|positive) + 1}{P(w_i|negative) + 1})=$
+
+$log(\frac{P(is|positive) + 1}{P(is|negative) + 1}) + log(\frac{P(fox|positive) + 1}{P(fox|negative) + 1}) + log(\frac{P(happy|positive) + 1}{P(happy|negative) + 1})=$
+
+$log(\frac{0.1666 + 1}{0.1666 + 1}) + log(\frac{0.3333 + 1}{0.3333 + 1}) + log(\frac{0.3333 + 1}{0 + 1})=log(1) + log(1) + log(1.3333)=0 + 0 + 0.124 = 0.124 > 0$
+
+(can be classified as positive)
+
+## Improved Naive Baye's Laplacian Smoothing + Log Likelihood
+
+As a conclusion, a better naive bayes classifier can be built by using:
+
+* laplacian smoothing to avoid 0 probabilities
+* log likelihood to handle longer word sequences.
+
+Therefore the final classifier formula becomes:
+
+$$
+\sum_{i=1}^{m} log(\frac{ \frac{P(w_i|positive) + 1}{N_{class} + V} }{    \frac{P(w_i|negative) + 1}{N_{class} + V}    })=
+$$
+
+where m is each word in a sentence

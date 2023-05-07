@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-05-07-naive-bayes-classifier/index.html",
       "/posts/2023-04-10-time-to-blog-again/index.html",
       "/posts/2016-01-26-express-business-language-in-your-code-with-use-cases/index.html",
       "/posts/2015-07-26-from-static-language-style-api-to-ruby-style-api/index.html",
