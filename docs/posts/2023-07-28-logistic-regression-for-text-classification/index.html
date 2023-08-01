@@ -7,9 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Humberto C Marchezi">
-<meta name="dcterms.date" content="2009-09-27">
+<meta name="dcterms.date" content="2023-07-28">
+<meta name="description" content="Text classification with logistic regression">
 
-<title>Mukeka &amp; Tech - Extreme Programming Impressions</title>
+<title>Mukeka &amp; Tech - Text Classification with Logistic Regression</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,6 +22,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -61,7 +96,12 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="../../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -103,9 +143,14 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Extreme Programming Impressions</h1>
-                                <div class="quarto-categories">
-                <div class="quarto-category">software-engineering</div>
+      <h1 class="title">Text Classification with Logistic Regression</h1>
+                  <div>
+        <div class="description">
+          Text classification with logistic regression
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">machine-learning</div>
               </div>
                   </div>
   </div>
@@ -123,7 +168,7 @@ ul.task-list li input[type="checkbox"] {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">September 27, 2009</p>
+        <p class="date">July 28, 2023</p>
       </div>
     </div>
     
@@ -141,18 +186,218 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<p>Whe I first read about XP Programming in 2002 ( http://www.extremeprogramming.org/ ) which is one of the agile methodologies for software development I didn’t take it seriously.<br>
-At that time the authors of this methodology were saying that software didn´t need to be documented, models were not necessary or useful at all, people should be the documentation of the software, etc.<br>
-Immediately it came to my mind that it couldn´t work for many small (and big) software companies due to several problems:</p>
-<p>– Software companies are constantly loosing and hiring workforce so how can they work if they keep loosing “documentation” which is on people´s minds ?</p>
-<p>– How can they know the “what”, “where” and “how” in the source code ?</p>
-<p>Some years have passed and this methodology has matured and besides that other good methodologies of the same family like Scrum have come up too.<br>
-It called my attention that many state-of-art tech companies like Google and Yahoo! were working with Scrum and I started to get curious to know what it is about.</p>
-<p>Five years later I decided to attend to a presentation about XP Programming in order to get a broader picture about it. It helped me to remove some miths I had such as the lack of documentation. Actually the Agile Methodology do not remove the activity of producing documentation but it just gave a different meaning for the documentation. The documentation should be provided if relevant for developers. It doesn´t have to include fancy diagrams but only the necessary information such as what is the system about, how to compile source-code, or other information that it is not self-explained in the system.</p>
-<p>After reading “The Toyota Way” I noticed that agile methodologies was greatly inspired by this administration model. This model is basically driven to reduce waste, in other words, we should do only the necessary to accomplish our objectives, no more or no less. By reducing waste we are also reducing unnecessary work what can mean different things depending on our project such as no documentation, few documentation, no models, etc.</p>
-<p>Therefore to be lean (and consequently agile), one must think on what tasks are been carried out and what tasks in the process should be eliminated if they have no value. Read the book above to have a good idea of the process.</p>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>Logistics regression is a well known statistics tool for classification including text. The steps to implement a text classifier with this statistic tool will be explained here.</p>
+</section>
+<section id="training-flow" class="level2">
+<h2 class="anchored" data-anchor-id="training-flow">Training Flow</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+    A[Text] --&gt; B["Feature_Extraction(T)"]
+    B --&gt; C["Prediction_Function(X)"]
+    C --&gt; D["Output Y^"]
+    D --&gt; E["Cost_Function(Y, Y^)"]
+    E --&gt; C
+</pre>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="vocabulary-feature-extraction" class="level2">
+<h2 class="anchored" data-anchor-id="vocabulary-feature-extraction">Vocabulary &amp; Feature Extraction</h2>
+<section id="one-hot-encoding" class="level3">
+<h3 class="anchored" data-anchor-id="one-hot-encoding">One-Hot-Encoding</h3>
+<p>Consists of creating a vector of 0s and 1s (no other values) where each position represents a word in the vocabulary. If a word is present in a phrase (such a Twit) the corresponding position would be marked as 1 otherwise 0.</p>
+<ul>
+<li><em>Problem: Long training and prediction time:</em> It can get too big and sparse when a large vocabulary from many different texts are used.</li>
+</ul>
+</section>
+<section id="negative-and-positive-frequencies" class="level3">
+<h3 class="anchored" data-anchor-id="negative-and-positive-frequencies">Negative and Positive Frequencies</h3>
+<p>The idea is to use feature vectors to count word frequencies for each prediction category (such as positive/negative in sentiment analysis). Global feature vector is calculated for each word, following the steps below:</p>
+<p>Map(word) —&gt; occurrence of that word in a given class</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th>I</th>
+<th>am</th>
+<th>happy</th>
+<th>sad</th>
+<th>never</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Positive</td>
+<td>2</td>
+<td>2</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td>Negative</td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
+<td>2</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="preprocessing" class="level2">
+<h2 class="anchored" data-anchor-id="preprocessing">Preprocessing</h2>
+<ul>
+<li><p><strong>tokenization</strong> - break text into array of words</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> nltk.tokenize <span class="im">import</span> TweetTokenizer</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>stop words</strong> - eliminate meaningless words (punctuation, articles, prepositions, not-important symbols, etc.)</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> nltk.corpus <span class="im">import</span> stopwords</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> string</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>nltk.download(‘stopwords’)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>stopwords_english <span class="op">=</span> stopwords.words(‘english’)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>punctuation <span class="op">=</span> string.punctuation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>stemming</strong> - map word to its root form (remove ing, ed, etc.)</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> nltk.stem <span class="im">import</span> PorterStemmer</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>stemmer <span class="op">=</span> PorterStemmer()</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>stemmed_text <span class="op">=</span> [ ]</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> word <span class="kw">in</span> text:</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>stem_word <span class="op">=</span> stemmer.stem(word)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>stemmed_text.append(stem_word)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>lowercase</strong> - convert all words to lowercase</p></li>
+</ul>
+</section>
+<section id="logistics-regression" class="level2">
+<h2 class="anchored" data-anchor-id="logistics-regression">Logistics Regression</h2>
+<p>Logistics is, in essence, linear regression with sigmoid function. <span class="math inline">\(h(z) = \frac{1}{1 + e^{-z}}\)</span> with <span class="math inline">\(z = \theta^T x\)</span></p>
+<p>OR</p>
+<p><span class="math inline">\(sigmoid(x_0 \theta_0 + x_1 \theta_1 + x_2 \theta_2 + x_3 \theta_3)\)</span></p>
+</section>
+<section id="training-workflow" class="level2">
+<h2 class="anchored" data-anchor-id="training-workflow">Training Workflow</h2>
+<div class="columns">
+<div class="column" style="width:45%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<div>
+<pre class="mermaid mermaid-js">flowchart TD
+    A["Theta"] --&gt; B["h = h(X, Theta)"]
+    B --&gt; C["Nabla = 1/m X^t (h - y)"]
+    C --&gt; D["Theta = Theta - Alpha Nabla"]
+    D --&gt; E["J(Theta)"]
+    E --&gt; B
+
+</pre>
+</div>
+</div>
+</div>
+</div>
+<p><strong>Legend:</strong></p>
+<ul>
+<li><span class="math inline">\(\theta\)</span> = Theta</li>
+<li><span class="math inline">\(\alpha\)</span> = Alpha</li>
+<li><span class="math inline">\(\nabla\)</span> = Nabla</li>
+</ul>
+</div><div class="column" style="width:5%;">
+<p><br>
+</p>
+</div><div class="column" style="width:45%;">
+<p><br>
+</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<div>
+<pre class="mermaid mermaid-js">flowchart TD
+    A["Initialize parameters"] --&gt; B["Classify/predict"]
+    B --&gt; C["Get gradient"]
+    C --&gt; D["Update"]
+    D --&gt; E["Get Loss"]
+    E --&gt; B
+
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<section id="testing-with-accuracy" class="level3">
+<h3 class="anchored" data-anchor-id="testing-with-accuracy">Testing (with accuracy)</h3>
+<p>Testing can be done via cross-validation data with <span class="math inline">\(X_{val}\)</span>, <span class="math inline">\(Y_{val}\)</span> and <span class="math inline">\(\theta\)</span> on the model to optimize hyper-parameters.</p>
+<ul>
+<li><span class="math inline">\(X_{val} Y_{val} \theta\)</span>
+<ul>
+<li><span class="math inline">\(h(X_{val} . \theta)\)</span></li>
+<li><span class="math inline">\(pred = h(X_{val} . \theta) &gt;= 0.5\)</span></li>
+</ul></li>
+</ul>
+<p><span class="math display">\[
+\begin{bmatrix}
+0.3 \\
+0.8 \\
+0.5 \\
+\vdots \\
+h_m
+\end{bmatrix}
+&gt;= 0.5 =
+\begin{bmatrix}
+0.3 &gt; 0.5 \\
+0.8 &gt; 0.5 \\
+0.5 &gt; 0.5\\
+\vdots \\
+pred_m &gt; 0.5
+\end{bmatrix}
+=
+\begin{bmatrix}
+0 \\
+1 \\
+1 \\
+\vdots \\
+pred_m
+\end{bmatrix}
+\]</span></p>
+<p><span class="math display">\[
+Accuracy \rightarrow \sum_{i=1, m} \frac{ (pred^{(i)} == y_{val}^{(i)}) }{m}
+\]</span></p>
+<p><strong>Cost Function</strong></p>
+<p>Makes use of a cost function <strong>J</strong> composed by 2 parts: * left part (yellow) is relevant when <span class="math inline">\(y(i) == 1\)</span> * right part (blue) is relevant when <span class="math inline">\(y(i) == 0\)</span></p>
+<p><span class="math display">\[
+J(\theta) = - \frac{1}{m} \sum_{i=1,m} log(h(x^{(i)}, \theta)) + (1 - y^{(i)}) log(1 - h(x^{(i)}, \theta))   
+\]</span></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="cost.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">logistics cost function</figcaption>
+</figure>
+</div>
+</section>
+<section id="gradient-calculation-optimization" class="level3">
+<h3 class="anchored" data-anchor-id="gradient-calculation-optimization">Gradient Calculation (Optimization)</h3>
+<p>Gradient is calculated to adjust logistics-regression parameters during training (see flow below):</p>
+<p><code>Repeat {</code> <span class="math inline">\(\theta_j = \theta_j - \alpha \frac{\partial }{\partial \theta_j} J(\theta)\)</span> <code>}</code></p>
+<p>For all <span class="math inline">\(j\)</span>, calculate derivatives:</p>
+<p><code>Repeat {</code> <span class="math inline">\(\theta_j = \theta_j - \frac{\alpha}{m} \sum_{i=1,m} (h(x^{(i)}, \theta) - y^{(i)}) x_j^{(i)}\)</span> <code>}</code></p>
+<p>Derivative calculation can be summarized as: (with vectors)</p>
+<p><span class="math display">\[
+\theta = \theta - \frac{\alpha}{m} X^{T} (H(X, \theta) - Y)
+\]</span></p>
+<p>With cost function as:</p>
+<p><span class="math display">\[
+\partial J(\theta) = \frac{1}{m} . X^T . (H(X, \theta) - Y)
+\]</span></p>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

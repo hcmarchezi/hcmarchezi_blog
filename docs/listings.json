@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2023-07-28-logistic-regression-for-text-classification/index.html",
       "/posts/2023-05-07-naive-bayes-classifier/index.html",
       "/posts/2023-04-10-time-to-blog-again/index.html",
       "/posts/2016-01-26-express-business-language-in-your-code-with-use-cases/index.html",
@@ -17,8 +18,8 @@
       "/posts/2010-06-03-tools-and-utilities-for-the-net-developer/index.html",
       "/posts/2010-05-09-using-fluent-builder-pattern-to-configure-test-objects/index.html",
       "/posts/2010-05-08-test-driven-development-best-practices/index.html",
-      "/posts/2010-02-24-name-convention-for-object-oriented-apps/index.html",
       "/posts/2010-02-24-simplest-dao-for-net/index.html",
+      "/posts/2010-02-24-name-convention-for-object-oriented-apps/index.html",
       "/posts/2010-02-22-unit-testing-linq-queries-in-moq/index.html",
       "/posts/2009-12-26-model-view-controller-with-events-in-net/index.html",
       "/posts/2009-09-27-extreme-programming-impressions/index.html",
@@ -32,8 +33,8 @@
       "/posts/2008-11-23-generating-software-documentation-from-unit-tests/index.html",
       "/posts/2008-08-19-efficient-software-development-process-with-open-source-tools-for-net/index.html",
       "/posts/2008-07-24-scrum-as-a-criteria-for-venture-capital-groups/index.html",
-      "/posts/2008-07-18-unit-tests-rule-software-development/index.html",
       "/posts/2008-07-18-5-things-you-should-remember-about-nhibernate/index.html",
+      "/posts/2008-07-18-unit-tests-rule-software-development/index.html",
       "/posts/2008-03-19-rich-domain-objects/index.html",
       "/posts/2007-12-20-best-practice-to-handle-exceptions/index.html",
       "/posts/2007-12-03-choosing-the-right-primary-keys/index.html",

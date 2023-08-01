@@ -3,6 +3,7 @@ title: "Text Classification with Naive Baye's"
 author: "Humberto C Marchezi"
 date: "2023-05-07"
 categories: [machine-learning]
+description: Improved techniques to implement Naive Bayes for text classification such as Laplacian Smoothing and Log Likelihood
 ---
 
 ## Introduction
