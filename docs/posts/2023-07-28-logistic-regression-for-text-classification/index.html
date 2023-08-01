@@ -276,9 +276,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="logistics-regression" class="level2">
 <h2 class="anchored" data-anchor-id="logistics-regression">Logistics Regression</h2>
-<p>Logistics is, in essence, linear regression with sigmoid function. <span class="math inline">\(h(z) = \frac{1}{1 + e^{-z}}\)</span> with <span class="math inline">\(z = \theta^T x\)</span></p>
+<p>Logistics is, in essence, linear regression with sigmoid function (<span class="math inline">\(\sigma\)</span>).</p>
+<p><span class="math inline">\(h(z) = \frac{1}{1 + e^{-z}}\)</span> with <span class="math inline">\(z = \theta^T x\)</span></p>
 <p>OR</p>
-<p><span class="math inline">\(sigmoid(x_0 \theta_0 + x_1 \theta_1 + x_2 \theta_2 + x_3 \theta_3)\)</span></p>
+<p><span class="math inline">\(\sigma(x_0 \theta_0 + x_1 \theta_1 + x_2 \theta_2 + x_3 \theta_3)\)</span></p>
 </section>
 <section id="training-workflow" class="level2">
 <h2 class="anchored" data-anchor-id="training-workflow">Training Workflow</h2>
@@ -366,12 +367,12 @@ pred_m
 \end{bmatrix}
 \]</span></p>
 <p><span class="math display">\[
-Accuracy \rightarrow \sum_{i=1, m} \frac{ (pred^{(i)} == y_{val}^{(i)}) }{m}
+Accuracy \rightarrow \sum_{i=1}^{m} \frac{ (pred^{(i)} == y_{val}^{(i)}) }{m}
 \]</span></p>
 <p><strong>Cost Function</strong></p>
 <p>Makes use of a cost function <strong>J</strong> composed by 2 parts: * left part (yellow) is relevant when <span class="math inline">\(y(i) == 1\)</span> * right part (blue) is relevant when <span class="math inline">\(y(i) == 0\)</span></p>
 <p><span class="math display">\[
-J(\theta) = - \frac{1}{m} \sum_{i=1,m} log(h(x^{(i)}, \theta)) + (1 - y^{(i)}) log(1 - h(x^{(i)}, \theta))   
+J(\theta) = - \frac{1}{m} \sum_{i=1}^{m} log(h(x^{(i)}, \theta)) + (1 - y^{(i)}) log(1 - h(x^{(i)}, \theta))   
 \]</span></p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -385,7 +386,7 @@ J(\theta) = - \frac{1}{m} \sum_{i=1,m} log(h(x^{(i)}, \theta)) + (1 - y^{(i)}) l
 <p>Gradient is calculated to adjust logistics-regression parameters during training (see flow below):</p>
 <p><code>Repeat {</code> <span class="math inline">\(\theta_j = \theta_j - \alpha \frac{\partial }{\partial \theta_j} J(\theta)\)</span> <code>}</code></p>
 <p>For all <span class="math inline">\(j\)</span>, calculate derivatives:</p>
-<p><code>Repeat {</code> <span class="math inline">\(\theta_j = \theta_j - \frac{\alpha}{m} \sum_{i=1,m} (h(x^{(i)}, \theta) - y^{(i)}) x_j^{(i)}\)</span> <code>}</code></p>
+<p><code>Repeat {</code> <span class="math inline">\(\theta_j = \theta_j - \frac{\alpha}{m} \sum_{i=1}^{m} (h(x^{(i)}, \theta) - y^{(i)}) x_j^{(i)}\)</span> <code>}</code></p>
 <p>Derivative calculation can be summarized as: (with vectors)</p>
 <p><span class="math display">\[
 \theta = \theta - \frac{\alpha}{m} X^{T} (H(X, \theta) - Y)

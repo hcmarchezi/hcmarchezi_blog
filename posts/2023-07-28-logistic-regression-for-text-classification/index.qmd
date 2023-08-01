@@ -74,12 +74,13 @@ Map(word) ---> occurrence of that word in a given class
 
 ## Logistics Regression
 
-Logistics is, in essence, linear regression with sigmoid function.
+Logistics is, in essence, linear regression with sigmoid function ($\sigma$).
+
 $h(z) = \frac{1}{1 + e^{-z}}$  with  $z = \theta^T x$                
 
 OR
 
-$sigmoid(x_0 \theta_0 + x_1 \theta_1 + x_2 \theta_2 + x_3 \theta_3)$
+$\sigma(x_0 \theta_0 + x_1 \theta_1 + x_2 \theta_2 + x_3 \theta_3)$
 
 ## Training Workflow
 
@@ -163,7 +164,7 @@ pred_m
 $$
 
 $$
-Accuracy \rightarrow \sum_{i=1, m} \frac{ (pred^{(i)} == y_{val}^{(i)}) }{m} 
+Accuracy \rightarrow \sum_{i=1}^{m} \frac{ (pred^{(i)} == y_{val}^{(i)}) }{m} 
 $$
 
 **Cost Function**
@@ -173,7 +174,7 @@ Makes use of a cost function **J** composed by 2 parts:
 * right part (blue) is relevant when $y(i) == 0$
 
 $$
-J(\theta) = - \frac{1}{m} \sum_{i=1,m} log(h(x^{(i)}, \theta)) + (1 - y^{(i)}) log(1 - h(x^{(i)}, \theta))   
+J(\theta) = - \frac{1}{m} \sum_{i=1}^{m} log(h(x^{(i)}, \theta)) + (1 - y^{(i)}) log(1 - h(x^{(i)}, \theta))   
 $$
 
 ![logistics cost function](cost.png)
@@ -193,7 +194,7 @@ For all $j$, calculate derivatives:
 
 
 `Repeat {`
-$\theta_j = \theta_j - \frac{\alpha}{m} \sum_{i=1,m} (h(x^{(i)}, \theta) - y^{(i)}) x_j^{(i)}$
+$\theta_j = \theta_j - \frac{\alpha}{m} \sum_{i=1}^{m} (h(x^{(i)}, \theta) - y^{(i)}) x_j^{(i)}$
 `}`
 
 
