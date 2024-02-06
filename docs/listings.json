@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2024-02-05-vector-space-for-words-and-document/index.html",
       "/posts/2023-07-28-logistic-regression-for-text-classification/index.html",
       "/posts/2023-05-07-naive-bayes-classifier/index.html",
       "/posts/2023-04-10-time-to-blog-again/index.html",
@@ -13,13 +14,13 @@
       "/posts/2012-12-06-rorm---ruby-domain-objects-with-persistence/index.html",
       "/posts/2012-11-12-separated-interface-design-pattern/index.html",
       "/posts/2011-08-28-javascript-object-oriented-programming/index.html",
-      "/posts/2011-02-27-publishing-clickonce-winforms-applications-with-command-line-msbuild/index.html",
       "/posts/2011-02-27-iphone-development-to-objective-c-or-not-to-objective-c-/index.html",
+      "/posts/2011-02-27-publishing-clickonce-winforms-applications-with-command-line-msbuild/index.html",
       "/posts/2010-06-03-tools-and-utilities-for-the-net-developer/index.html",
       "/posts/2010-05-09-using-fluent-builder-pattern-to-configure-test-objects/index.html",
       "/posts/2010-05-08-test-driven-development-best-practices/index.html",
-      "/posts/2010-02-24-simplest-dao-for-net/index.html",
       "/posts/2010-02-24-name-convention-for-object-oriented-apps/index.html",
+      "/posts/2010-02-24-simplest-dao-for-net/index.html",
       "/posts/2010-02-22-unit-testing-linq-queries-in-moq/index.html",
       "/posts/2009-12-26-model-view-controller-with-events-in-net/index.html",
       "/posts/2009-09-27-extreme-programming-impressions/index.html",

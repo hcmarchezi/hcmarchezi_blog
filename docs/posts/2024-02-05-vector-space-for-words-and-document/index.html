@@ -7,9 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Humberto C Marchezi">
-<meta name="dcterms.date" content="2007-05-09">
+<meta name="dcterms.date" content="2024-02-05">
+<meta name="description" content="Why and how to use vector to extract information from documents">
 
-<title>Mukeka &amp; Tech - My First Big Enterprise System with NHibernate</title>
+<title>Mukeka &amp; Tech - Vector Space for Documents</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -69,6 +70,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -110,9 +140,14 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">My First Big Enterprise System with NHibernate</h1>
-                                <div class="quarto-categories">
-                <div class="quarto-category">software-engineering</div>
+      <h1 class="title">Vector Space for Documents</h1>
+                  <div>
+        <div class="description">
+          Why and how to use vector to extract information from documents
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">machine-learning</div>
               </div>
                   </div>
   </div>
@@ -130,7 +165,7 @@ ul.task-list li input[type="checkbox"] {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">May 9, 2007</p>
+        <p class="date">February 5, 2024</p>
       </div>
     </div>
     
@@ -149,11 +184,270 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<p>We just finished to deliver our first big .NET system with a 4-Layered Architecture and domain objects. The proof-of-concepts is done also for big systems.</p>
-<p>Because we use a 4-Layered Architecture, the same business rules describe in the Task Layer (or Service Layer, as you wish) are applied to both the desktop and the web versions of the application.</p>
-<p>NHibernate has also proven its value showing that it has enough performance for any kind of systems. I am anxious to start building other layered object-oriented systems like this.</p>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>Transforming document context into vectors provide several advantages such as: * calculate similarity between documents with vector distance * find similar groups of documents by applying a cluster algorithm * get a visual representation of similar documents with dimensionality reduction</p>
+<p>There are several designs to represent a document as a vector, one of the simplest is a word-count per document.</p>
+<p>Also how to measure similarity between document vectors.</p>
+</section>
+<section id="transforming-a-document-into-a-vector" class="level2">
+<h2 class="anchored" data-anchor-id="transforming-a-document-into-a-vector">Transforming a Document into a Vector</h2>
+<p>In this approach, each vector position represents a words and each value a frequency count (word-count).</p>
+<p>This way the text below:</p>
+<pre class="text"><code>I like to eat hamburguer.
+Buying peperoni hamburguer to eat.</code></pre>
+<p>Is mapped as:</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>I</th>
+<th>like</th>
+<th>to</th>
+<th>eat</th>
+<th>hamburguer</th>
+<th>buying</th>
+<th>peperoni</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="similarity-among-documents" class="level2">
+<h2 class="anchored" data-anchor-id="similarity-among-documents">Similarity Among Documents</h2>
+<p>Using the idea describe above, several documents can be mapped as vectors and placed in a table such as:</p>
+<table class="table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 9%">
+<col style="width: 14%">
+<col style="width: 9%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>document</th>
+<th>I</th>
+<th>do</th>
+<th>play</th>
+<th>weekend</th>
+<th>ball</th>
+<th>peperoni</th>
+<th>sometimes</th>
+<th>…</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>D1</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+<td>7</td>
+<td>…</td>
+</tr>
+<tr class="even">
+<td>D2</td>
+<td>12</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>11</td>
+<td>…</td>
+</tr>
+<tr class="odd">
+<td>D3</td>
+<td>8</td>
+<td>12</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>9</td>
+<td>…</td>
+</tr>
+<tr class="even">
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody>
+</table>
+<p>Given that documents are represented as vector, the distance between 2 vectors can be calculated as:</p>
+<ul>
+<li><p>Euclidean distance <span class="math inline">\(dist(D1, D2)=\sqrt{ \sum_{i=1}^{n} (D1 - D2)^2 }\)</span></p></li>
+<li><p>Cosine similarity <span class="math inline">\(\cos(\theta)=\frac{D1 \cdot D2}{\left \| D1 \right \|  \left \| D2 \right \|}\)</span> <span class="math inline">\(\cos(\theta)=\frac{ \sum_{i=1}^{n} D1_i D2_i }{ \sqrt{ \sum_{i=1}^{n} {D1_i}^2 } \cdot \sqrt{ \sum_{i=1}^{n} {D2_i}^2 } }\)</span></p></li>
+</ul>
+<p>PS: Prefer <strong>cosine similarity</strong> is preferred since it works well even with vectors with different magnitude.</p>
+<p>PS: Consider converting document vector to unitary vector before using with euclidean distance</p>
+</section>
+<section id="find-document-clusters" class="level2">
+<h2 class="anchored" data-anchor-id="find-document-clusters">Find Document Clusters</h2>
+<section id="k-means-with-euclidean-distance" class="level3">
+<h3 class="anchored" data-anchor-id="k-means-with-euclidean-distance">K-Means with Euclidean Distance</h3>
+<p>Euclidean distance provides a distance function between 2 document-vectors D1 and D2 by considering each dimension distance separately.</p>
+<p>Besides an average vector can be calculated by averaging a dataset of document vectors in a table <span class="math inline">\(DT\)</span>.</p>
+<p><span class="math inline">\(DT=\frac{ \sum_{i=1}^{n} DT_i }{ n }\)</span></p>
+<p>Given the documents:</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>document</th>
+<th>I</th>
+<th>do</th>
+<th>play</th>
+<th>weekend</th>
+<th>ball</th>
+<th>peperoni</th>
+<th>sometimes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>D1</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+<td>7</td>
+</tr>
+<tr class="even">
+<td>D2</td>
+<td>12</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>11</td>
+</tr>
+<tr class="odd">
+<td>D3</td>
+<td>8</td>
+<td>12</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>9</td>
+</tr>
+</tbody>
+</table>
+<p>The sum of those documents are:</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th></th>
+<th>I</th>
+<th>do</th>
+<th>play</th>
+<th>weekend</th>
+<th>ball</th>
+<th>peperoni</th>
+<th>sometimes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>sum</td>
+<td>21</td>
+<td>14</td>
+<td>2</td>
+<td>2</td>
+<td>1</td>
+<td>3</td>
+<td>27</td>
+</tr>
+</tbody>
+</table>
+<p>with n = 3 (number of documents) then average vector is:</p>
+<table class="table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 6%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 14%">
+<col style="width: 10%">
+<col style="width: 15%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>I</th>
+<th>do</th>
+<th>play</th>
+<th>weekend</th>
+<th>ball</th>
+<th>peperoni</th>
+<th>sometimes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>average</td>
+<td>7</td>
+<td>4.667</td>
+<td>0.667</td>
+<td>0.667</td>
+<td>0.333</td>
+<td>1</td>
+<td>9</td>
+</tr>
+</tbody>
+</table>
+<p>Given a enclidean distance and average functions above, then a cluster mechanism can be built on top of a cluster algorithm such as K-means whose standard steps are described as:</p>
+<ol type="1">
+<li><span class="math inline">\(K\)</span> initial vectors are randomly generated inside data range as centroids</li>
+<li>Each document-vector is associated to the closest centroid using the distance function (K clusters)</li>
+<li>Inside each cluster <span class="math inline">\(K_i\)</span>, a new centroid is calculated with average vector function</li>
+<li>Repeat steps 2 and 3 until the distance of new centroid’s locations from original is less than a threshold</li>
+</ol>
+</section>
+</section>
+<section id="visual-representation-with-dimensionality-reduction" class="level2">
+<h2 class="anchored" data-anchor-id="visual-representation-with-dimensionality-reduction">Visual Representation with Dimensionality Reduction</h2>
+<p>Visualising documents in 2 dimensions can provide a graphical and intuitive way to communicate how or perhaps why groups of documents are created.</p>
+<p>First each document vector need to be mapped to a 2 dimension vector so it can be visualised with PCA (principal component analysis).</p>
+<p>Details on PCA can be found <a href="https://arxiv.org/abs/1404.1100">here</a>.</p>
+<p>With the 2D document vectors, one can come up with a visualisation such as scatterplot to present to an audience or gain more insigths on the data:</p>
+<p><img src="word-vector-diagram.png" class="img-fluid" alt="document visualisation allows for cluster discovery"></p>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>Learning how to convert document to vector can help perform analysis more quickly. Some applications are cited above however there are more, for instance, document-vectors that belong to the same category such as finance, movies, tech, etc can be summed up together to describe a vector information of that group and perhaps help classify another document to the nearest category using a distance function.</p>
+<p>The new document to be classified just needs to be converted to a vector and then this vector needs to be compared by distance to the document-category vectors.</p>
+<p>Another application is to detect plagiarism, by measuring the distance between a given input document to a dataset of known documents.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
