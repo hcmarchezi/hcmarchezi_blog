@@ -1,8 +1,0 @@
----
-title: "Simplest DAO for .NET"
-author: "Humberto C Marchezi"
-date: "2010-02-24"
-categories: [software-engineering]
----
-
-Take your post from NHUsers group and paste here.

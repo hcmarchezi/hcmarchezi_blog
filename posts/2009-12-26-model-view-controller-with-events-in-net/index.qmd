@@ -34,7 +34,7 @@ views.
 
 The example below shows a client registration view:  
 
-``` prettyprint
+```csharp
 using System;
 namespace MyController
 {
@@ -45,8 +45,8 @@ namespace MyController
     public string Registration { get; set; }
     public event ClientEventHandler InsertRequested;
     public event ClientEventHandler UpdateRequested;
-    public event ObjectIdEventHandler &lt long &gt RemoveRequested;
-    public event ObjectIdEventHandler &lt long &gt RetrieveRequested;
+    public event ObjectIdEventHandler<long> RemoveRequested;
+    public event ObjectIdEventHandler<long> RetrieveRequested;
   }
 }
 ```
@@ -69,7 +69,7 @@ See event argument classes below:
 
   
 
-``` prettyprint
+```csharp
 using System;
 namespace MyController
 {
@@ -85,12 +85,12 @@ namespace MyController
 
   
 
-``` prettyprint
+```csharp
 using System;
 namespace MyController
 {
-  public delegate void ObjectIdEventHandler &lt T &gt (object sender, ObjectIdEventArgs &lt T &gt e);
-  public class ObjectIdEventArgs &lt T &gt : EventArgs
+  public delegate void ObjectIdEventHandler<T> (object sender, ObjectIdEventArgs<T> e);
+  public class ObjectIdEventArgs<T> : EventArgs
   {
     public T Id { get; set; }
   }
@@ -113,7 +113,7 @@ In this example, the service acts as if it was the model of the system.
 
   
 
-``` prettyprint
+```csharp
 using System;
 using MyService;
 namespace MyController
@@ -127,8 +127,8 @@ namespace MyController
       View = view;
       View.InsertRequested += new ClientEventHandler(View_InsertRequested);
       View.UpdateRequested += new ClientEventHandler(View_UpdateRequested);
-      View.RemoveRequested += new ObjectIdEventHandler &lt long &gt (View_RemoveRequested);
-      View.RetrieveRequested += new ObjectIdEventHandler &lt long &gt (View_RetrieveRequested);
+      View.RemoveRequested += new ObjectIdEventHandler<long> (View_RemoveRequested);
+      View.RetrieveRequested += new ObjectIdEventHandler<long> (View_RetrieveRequested);
       Service = new ClientRegistrationService();   
     }
     void View_InsertRequested(object sender, ClientEventArgs e)
@@ -141,11 +141,11 @@ namespace MyController
     {
       Service.Update(new ClientDTO() { Id = e.Id, Name = e.Name, Registration = e.Registration });
     }
-    void View_RemoveRequested(object sender, ObjectIdEventArgs &lt long &gt e)
+    void View_RemoveRequested(object sender, ObjectIdEventArgs<long> e)
     {
       Service.Remove(e.Id);
     }
-    void View_RetrieveRequested(object sender, ObjectIdEventArgs &lt long &gt e)
+    void View_RetrieveRequested(object sender, ObjectIdEventArgs<long> e)
     {
       ClientDTO dto = Service.Retrieve(e.Id);
       this.View.Id = dto.Id;

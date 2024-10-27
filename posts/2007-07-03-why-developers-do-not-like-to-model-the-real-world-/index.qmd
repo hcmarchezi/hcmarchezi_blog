@@ -27,16 +27,19 @@ It is not uncommon to see the same pattern when modeling peoples roles
 in many other Class Diagrams or even Data Diagram ( Entity Relation ) .
 Many developers usually create a class (or table) for each role like
 this:  
-  
-[<img src="http://3.bp.blogspot.com/_WHpubqoOAQY/Ror10cMxdGI/AAAAAAAAAA8/qmaHtgtrFpE/s320/pattern_role_0.bmp" id="BLOGGER_PHOTO_ID_5083145410712794210" />](http://3.bp.blogspot.com/_WHpubqoOAQY/Ror10cMxdGI/AAAAAAAAAA8/qmaHtgtrFpE/s1600-h/pattern_role_0.bmp)It
-is not hard to see that as long as the system grows, more roles are
+
+![](pattern_role_0.jpg)
+
+It is not hard to see that as long as the system grows, more roles are
 needed. The additional classes multiply in the Class Model making it
 each time more complex to understand.  
   
 Interestingly there is an Analysis Pattern that deals with people's
 roles problem by providing a more elegant Class Modeling like this:  
-[<img src="http://3.bp.blogspot.com/_WHpubqoOAQY/Ror1EcMxdEI/AAAAAAAAAAs/62_LPab-5mU/s320/pattern_role_1.bmp" id="BLOGGER_PHOTO_ID_5083144586079073346" />](http://3.bp.blogspot.com/_WHpubqoOAQY/Ror1EcMxdEI/AAAAAAAAAAs/62_LPab-5mU/s1600-h/pattern_role_1.bmp)Now
-the roles are better organized and if more roles are needed they can be
+
+![](pattern_role_1.jpg)
+
+Now the roles are better organized and if more roles are needed they can be
 added to the Class Hierarchy. And that is all right.  
   
 This could be a perfect solution to the problem but let me ask you a
@@ -69,7 +72,8 @@ more intuitive. Thus it can be better understood and learned by newcome
 developers or other developers in a large enterprise system. Check out
 the Class Diagram below:  
   
-[<img src="http://3.bp.blogspot.com/_WHpubqoOAQY/Ror7BcMxdII/AAAAAAAAABM/aS6AswIh7Pc/s400/pattern_role_2.bmp" id="BLOGGER_PHOTO_ID_5083151131609232514" />](http://3.bp.blogspot.com/_WHpubqoOAQY/Ror7BcMxdII/AAAAAAAAABM/aS6AswIh7Pc/s1600-h/pattern_role_2.bmp)The
-Class Diagram above shows a Person with his/her documents the way as it
+![](pattern_role_2.jpg)
+
+The Class Diagram above shows a Person with his/her documents the way as it
 is in the Real World. If a another Document Type is needed it can be
 added to the hierarchy just like the prior class diagram.

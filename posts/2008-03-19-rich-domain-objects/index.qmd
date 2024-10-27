@@ -10,28 +10,28 @@ software development. However, many programmers tend to write these
 classes as simple get/set storage just like the example below in
 pseudo-code:  
 
-``` brush:
+```csharp
 class Client
 {
-private long id;
-public string Id
-{
-get { return this.id; }
-set { this.id = value }
-}
-private string name;
-public string Name
-{
-get {return this.name; }
-set { this.name = value; }
-}
+    private long id;
+    public string Id
+    {
+        get { return this.id; }
+        set { this.id = value }
+    }
+    private string name;
+    public string Name
+    {
+        get {return this.name; }
+        set { this.name = value; }
+    }
 
-private int registrationYear;
-public int RegistrationYear
-{
-get { return this.registrationyear; }
-set { registrationYear = value; }
-}
+    private int registrationYear;
+    public int RegistrationYear
+    {
+        get { return this.registrationyear; }
+        set { registrationYear = value; }
+    }
 }
 ```
 
@@ -62,7 +62,7 @@ design rules can be adopted:
 
   
 
-``` brush:
+```csharp
 // Rule 1 - Constructor with mandatory parameters
 public Client(name,registrationDate) {...}
 ```
@@ -76,7 +76,7 @@ public Client(name,registrationDate) {...}
 
   
 
-``` brush:
+```csharp
 // Rule 2 - Use properties instead of fields
 { this.Name = name; this.RegistrationDate = registrationDate; }
 ```
@@ -89,13 +89,15 @@ public Client(name,registrationDate) {...}
 
   
 
-``` brush:
+```csharp
 public string Name
 {
-get {return this.name; }
-// Rule 3 - Set property checks the input value
-set { if (value == "") throw new SystemException("Empty name is invalid");
-this.name = value; }
+    get { return this.name; }
+    // Rule 3 - Set property checks the input value
+    set { 
+        if (value == "") throw new SystemException("Empty name is invalid");
+        this.name = value;
+    }
 }
 ```
 
@@ -106,23 +108,20 @@ this.name = value; }
 
   
 
-``` brush:
+```csharp
 public int RegistrationYear
 {
-//Rule 4-Get property checks object and application state before returning a value
-get
-{
-if (User.CurrentUser().IsManager())
-return this.registrationYear;
-else
-throw new SystemException("No permission for Client's Registration Year.");
-}
-set
-{
-if ((value <> DateTime.now.year))
-throw new SystemException("Year must be from 1980 until now");
-this.registrationYear = value; }
-}
+    //Rule 4-Get property checks object and application state before returning a value
+    get
+    {
+        if (User.CurrentUser().IsManager()) return this.registrationYear;
+        else throw new SystemException("No permission for Client's Registration Year.");
+    }
+    set
+    {
+        if ((value <> DateTime.now.year)) throw new SystemException("Year must be from 1980 until now");
+        this.registrationYear = value;
+    }
 }
 ```
 
@@ -134,51 +133,48 @@ this.registrationYear = value; }
   
 Following this rules a Client class could be:  
 
-``` brush:
+```csharp
 // Rule 5 - Client Class is designed according to the business model
 class Client
 {
 // Rule 1 - Constructor with mandatory parameters
 public Client(name,registrationDate)
-// Rule 2 - Use properties instead of fields
-{ this.Name = name; this.RegistrationDate = registrationDate; }
+    // Rule 2 - Use properties instead of fields
+    { this.Name = name; this.RegistrationDate = registrationDate; }
 
-private string id;
-public string Id
-{
-get { return this.id; }
-set { this.id = value; }
-}
+    private string id;
+    public string Id
+    {
+        get { return this.id; }
+        set { this.id = value; }
+    }
 
-private string name;
-public string Name
-{
-get {return this.name; }
-// Rule 3 - Set property checks the input value
-set
-{
-if (value == "") throw new SystemException("Empty name is invalid");
-this.name = value;
-}
-}
+    private string name;
+    public string Name
+    {
+        get {return this.name; }
+        // Rule 3 - Set property checks the input value
+        set
+        {
+            if (value == "") throw new SystemException("Empty name is invalid");
+            this.name = value;
+        }
+    }
 
-private int registrationYear;
-public int RegistrationYear
-// Rule 4-Get property checks object and application state before returning a value
-{
-get
-{
-if (User.CurrentUser().IsManager())
-return this.registrationYear;
-else
-throw new SystemException("No permission for Client's Registration Year.");
-}
-set
-{
-if ((value != DateTime.now.year))
-throw new SystemException("Year must be from 1980 until now");
-this.registrationYear = value;
-}
-}
+    private int registrationYear;
+    public int RegistrationYear
+    // Rule 4-Get property checks object and application state before returning a value
+    {
+        get
+        {
+            if (User.CurrentUser().IsManager()) return this.registrationYear;
+            else throw new SystemException("No permission for Client's Registration Year.");
+        }
+        set
+        {
+            if ((value != DateTime.now.year)) throw new SystemException("Year must be from 1980 until now");
+            this.registrationYear = value;
+        }
+    }
 }
 ```

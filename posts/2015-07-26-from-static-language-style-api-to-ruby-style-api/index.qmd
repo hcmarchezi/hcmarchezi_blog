@@ -5,16 +5,11 @@ date: "2015-07-26"
 categories: [software-engineering]
 ---
 
-<div dir="ltr" style="text-align: left;" trbidi="on">
 
-It has passed some time since I published a
-[Naive_Bayes](https://github.com/hcmarchezi/naive_bayes) for
-text-classifier written in Ruby. At that time the API was designed very
-much influenced in way I have written a similar classifier in C++.
-However it was after a looked at the gem
-[Decider](https://github.com/danielsdeleo/Decider) that I realized how
-it was not taking advantage over the dynamic characteristics of Ruby to
-make Domain-Specific-Language APIs.
+It has passed some time since I published a [Naive_Bayes](https://github.com/hcmarchezi/naive_bayes) for
+text-classifier written in Ruby. At that time the API was designed very much influenced in way I have written a similar classifier in C++.
+However it was after a looked at the gem [Decider](https://github.com/danielsdeleo/Decider) that I realized how
+it was not taking advantage over the dynamic characteristics of Ruby to make Domain-Specific-Language APIs.
 
 Static characteristics of my original Ruby classifier interface
 ---------------------------------------------------------------
@@ -26,7 +21,7 @@ The following are the methods that called my attention:
 Use of *add_category* method to declare new categories expects a
 category name and an array of strings as an example.
 
-``` prettyprint
+```ruby
 classifier.add_category(name: :not_spam, training_set: [ 'Hi', 'Joe', 'how', 'are', 'you' ])
 ```
 
@@ -35,7 +30,7 @@ classifier.add_category(name: :not_spam, training_set: [ 'Hi', 'Joe', 'how', 'ar
 The *classify* method makes use of an array of string as input for
 classification.
 
-``` prettyprint
+```ruby
 category = classifier.classify(['Hi','James','are','you', 'going'])
 category.to_s # not_spam
 ```
@@ -49,7 +44,7 @@ Instead of adding categories with a training set the user should only be
 required to provide examples to its desired with a dynamically created
 method which corresponds to a category name.
 
-``` prettyprint
+```ruby
 classifier.not_spam << "Hi Joe, how are you"
 ```
 
@@ -59,11 +54,8 @@ Instead of requiring the user to break the string in an array the entire
 string can be classified. The classifier should also take the
 responsibility of breaking the string in words.
 
-``` prettyprint
+```ruby
 category = classifier.classify "Hi James,are you going ?"
 category.to_s # not_spam
 ```
 
-  
-
-</div>

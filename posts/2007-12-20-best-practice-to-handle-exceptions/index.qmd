@@ -17,27 +17,28 @@ the most specific to the most generic exception class until you can
 capture the exception type appropriately according to its type.  
 Check code below:  
 
-    try
-    {
-      // code block
-    }
-    catch ( SpecialSystemException e)
-    {
-      // code to handle SpecialSystemException  
-    }
-    catch ( SystemException e)
-    {
-      // code to handle SystemException
-    }
-    catch ( Exception e)
-    {
-      // code to handle Exception
-    }
-    finally
-    {
-      // finishes code block
-    }
-
+```csharp
+try
+{
+  // code block
+}
+catch ( SpecialSystemException e)
+{
+  // code to handle SpecialSystemException  
+}
+catch ( SystemException e)
+{
+  // code to handle SystemException
+}
+catch ( Exception e)
+{
+  // code to handle Exception
+}
+finally
+{
+  // finishes code block
+}
+```
   
   
 However in many cases it is desired to treat each exception same way
@@ -56,34 +57,37 @@ In order to solve this problem a better approach is to create a separate
 centralized class to treat all exceptions thrown from the system
 internally. Like the .NET pseudo-code example below:  
 
-    public class ExceptionHandler
+```csharp
+public class ExceptionHandler
+{
+  public static void Handler(Exception exception)
+  {
+    if (exception.GetType() == typeof(SpecialSystemException))
     {
-      public static void Handler(Exception exception)
-      {
-        if (exception.GetType() == typeof(SpecialSystemException))
-        {
-          // Code that deals with SpecialSystemException 
-        }   
-        else if (exception.GetType() == typeof(SystemException))
-        { 
-          // Code that deals with SystemException
-        }
-      else if (exeception.GetType() == typeof(Exception))
-      {
-          // Code that deals with Exception
-        }
+      // Code that deals with SpecialSystemException 
+    }   
+    else if (exception.GetType() == typeof(SystemException))
+    { 
+      // Code that deals with SystemException
     }
-
+  else if (exeception.GetType() == typeof(Exception))
+  {
+      // Code that deals with Exception
+    }
+}
+```
   
   
 Replacing the code of the first example:  
 
-    try
-    {
-      // code block
-    }
-    catch ( Exception e)
-    {
-      // Exceptions are now treated internally by the method below
-      ExceptionHandler.Handler(exception);
-    }
+```csharp
+try
+{
+  // code block
+}
+catch ( Exception e)
+{
+  // Exceptions are now treated internally by the method below
+  ExceptionHandler.Handler(exception);
+}
+```

@@ -5,7 +5,6 @@ date: "2016-01-26"
 categories: [software-engineering]
 ---
 
-<div dir="ltr" style="text-align: left;" trbidi="on">
 
 **Brief Introduction to Use Cases**
 -----------------------------------
@@ -15,11 +14,8 @@ functional aspect of a software. The use case diagram shows how the
 different system functionalities are associated to the different users
 in a system which are referred as actors.  
 
-<div style="text-align: center;">
 
-[<img src="http://4.bp.blogspot.com/-erCe1quN8Qc/Vqf_dgN0g9I/AAAAAAAA0TY/WXhfzpuI8c8/s400/use_case_tracebility.png" width="378" height="400" />](http://4.bp.blogspot.com/-erCe1quN8Qc/Vqf_dgN0g9I/AAAAAAAA0TY/WXhfzpuI8c8/s1600/use_case_tracebility.png)
-
-</div>
+![](use_case_tracebility.png)
 
   
 The specific user kind is referred in UML as an actor. Note in the
@@ -36,7 +32,8 @@ achieve his goals.
   
 For instance the "Enroll in Subject" use case can be described as
 follows:  
-  
+ 
+```text
 ====================================================  
 **Project:** My School System  
   
@@ -50,9 +47,6 @@ follows:
   
 **Normal Flow:**  
 
-<div style="text-align: left;">
-
-</div>
 
 -   (n1) System lists all available subjects which were not enrolled or
     completed by this student
@@ -73,7 +67,8 @@ enrollment.
 Student should not enroll in a subject he/she completed before.  
   
 ====================================================  
-  
+```
+
 Use cases popular in the 90s and begining of 2000s almost disappeared
 after that and recently there has been some interest in it perhaps
 because software engineers have identified a need to better understand
@@ -86,14 +81,12 @@ However use cases present many advantages such as:
     can be the bridge between engineers and domain experts since it
     talks the language of the business in a structured way.
 
-<!-- -->
 
 -   <u>Technology independence</u> - uses cases should not refer to
     specific technology in their descriptions such as web, http, button,
     dropdown, etc. - this way the contents continue to be useful even if
     those decisions change.
 
-<!-- -->
 
 -   <u>Enforces business flow</u> - as described before the flow
     structure of use cases drive domain experts to think in a structured
@@ -114,9 +107,10 @@ The following practices can be taken to clearly express use cases in
 your code:  
 **  
 ** **1) Represent each use case as a class**  
-The use case diagram above can be translated with the following class
-diagram:  
-[<img src="http://4.bp.blogspot.com/-QDjk1iBizBI/VqgKHNnhvLI/AAAAAAAA0To/GnLWBD6ZMcE/s640/class_diagram.png" width="640" height="64" />](http://4.bp.blogspot.com/-QDjk1iBizBI/VqgKHNnhvLI/AAAAAAAA0To/GnLWBD6ZMcE/s1600/class_diagram.png)  
+
+The use case diagram above can be translated with the following class diagram:  
+
+![](class_diagram.png)  
   
 Each class represent a function in the system. Note that sometimes a use
 case may describe more than one scenario what can happen in CRUD
@@ -131,7 +125,7 @@ possible the business flow description so to make it simpler and easier
 to correlate the documentation and code.  
   
 
-``` prettyprint
+```ruby
 class UseCaseSubjectEnrollment
   def list_subjects(student)
     Subject.list_available_for_student(student) # (n1)
@@ -188,12 +182,12 @@ and negative points:
 -   Doesn't pay off for highly dynamic and small websites where the
     business flow is simple and already known by engineers
 
-<div>
+
 
 In general it seems to me that the more complex a system is in term of
 business steps the better it is to start using use cases.
 
-</div>
+
 
   
 
@@ -213,9 +207,4 @@ http://www.wirfs-brock.com/PDFs/Art_of_Writing_Use_Cases.pdf
 Reenskaug and James O. Coplien - The DCI Architecture: A New Vision of
 Object-Oriented Programming  
   
-  
-  
-  
-  
 
-</div>

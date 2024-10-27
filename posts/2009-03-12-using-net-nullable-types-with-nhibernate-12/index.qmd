@@ -20,8 +20,8 @@ Nullable user types code listings:
   
 <span style="font-weight: bold;">NullableDateTimeType.cs</span>  
 
-``` prettyprint
-﻿using System;
+```csharp
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -106,7 +106,7 @@ namespace Utilitario.GerenciaDados
   
 <span style="font-weight: bold;">NullableBooleanType.cs</span>  
 
-``` prettyprint
+```csharp
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -187,7 +187,7 @@ namespace Utilitario.GerenciaDados
   
 <span style="font-weight: bold;">NullableCharType.cs</span>  
 
-``` prettyprint
+```csharp
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -268,7 +268,7 @@ namespace Utilitario.GerenciaDados
   
 <span style="font-weight: bold;">NullableDecimalType.cs</span>  
 
-``` prettyprint
+```csharp
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -350,7 +350,7 @@ namespace Utilitario.GerenciaDados
   
 <span style="font-weight: bold;">NullableDoubleType.cs</span>  
 
-``` prettyprint
+```csharp
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -430,7 +430,7 @@ namespace Utilitario.GerenciaDados
 
 <span style="font-weight: bold;">NullableInt32Type.cs</span>  
 
-``` prettyprint
+```csharp
 using System;
 using System.Collections.Generic;
 using System.Linq;

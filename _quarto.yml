@@ -4,6 +4,10 @@ project:
 
 website:
   title: "Mukeka & Tech"
+  twitter-card: true
+  open-graph: true
+  cookie-consent: true
+
   navbar:
     right:
       - about.qmd
@@ -12,10 +16,11 @@ website:
 
 format:
   html:
-    theme: slate
+    theme: superhero
     css: styles.css
 
 comments:
   giscus: 
     repo: hcmarchezi/hcmarchezi.github.io
 
+## include-after-body: footer.html

@@ -14,7 +14,7 @@ messy.
 Consider the situation below with C\#, NUnit and Moq framework  
   
 
-``` prettyprint
+```csharp
 [Test]
 [ExpectedException(InvalidPaymentAgreementException)]
 public void PaymentAgreementMustNotBeCreatedWhenThePaymentOptionIsNotValidForTheDebtType()
@@ -68,7 +68,7 @@ The unit test below is a rewritten from the example above with the
 concepts described here:  
   
 
-``` prettyprint
+```csharp
 [Test]
 [ExpectedException(InvalidPaymentAgreementException)]
 public void PaymentAgreementMustNotBeCreatedWhenThePaymentOptionIsNotValidForTheDebtType()
@@ -111,7 +111,7 @@ The fluent builder for Debt is DebtMockBuilder and can be programmed as
 follows:  
   
 
-``` prettyprint
+```csharp
     public class DebtMockBuilder
     {
         private Mock _debtMock;

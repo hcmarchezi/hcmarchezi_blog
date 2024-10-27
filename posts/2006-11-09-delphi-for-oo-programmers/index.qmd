@@ -14,18 +14,22 @@ The Delphi syntax for declaring classes is very bad. Instead of using a
 syntax similar to what we can find in C++, Java or C\# there were
 strange reserved words. For declaring a Person class, one must code:  
 
+```pascal
     type Person = class
       private
         name : string;
       end;
     end;
+```
 
   
 To inherit from a Person it should be something like:  
 
+```pascal
     type SpecialPerson = class(Person)
       ......
     end;
+```
 
   
 After that in the beginning, the speaker said the "some people" say that

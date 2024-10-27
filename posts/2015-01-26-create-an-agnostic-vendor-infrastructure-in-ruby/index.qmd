@@ -34,7 +34,8 @@ in handy:
     single defined interface that can be understood by the facade
 
   
-![](https://docs.google.com/drawings/d/1KjeuJpOAId3tUyO41OAfSVL-9rFSNxDCIbnOY--dBaA/pub?w=590&h=561)  
+![](cloud_storage_UML_diagram.png)  
+
 **1) Cloud Storage Facade**  
   
 

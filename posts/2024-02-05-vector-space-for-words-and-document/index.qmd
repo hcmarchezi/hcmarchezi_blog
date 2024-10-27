@@ -4,11 +4,14 @@ author: "Humberto C Marchezi"
 date: "2024-02-05"
 categories: [machine-learning]
 description: Why and how to use vector to extract information from documents
+execute:
+  echo: false
 ---
 
 ## Introduction
 
 Transforming document context into vectors provide several advantages such as:
+
 * calculate similarity between documents with vector distance
 * find similar groups of documents by applying a cluster algorithm
 * get a visual representation of similar documents with dimensionality reduction
@@ -117,8 +120,42 @@ Details on PCA can be found [here](https://arxiv.org/abs/1404.1100).
 With the 2D document vectors, one can come up with a visualisation such as scatterplot 
 to present to an audience or gain more insigths on the data:
 
-![](word-vector-diagram.png){fig-alt="document visualisation allows for cluster discovery"}
 
+```{python}
+#| fig-width: 8
+#| fig-height: 4
+#| fig-dpi: 72
+import matplotlib.pyplot as plt
+import numpy as np
+
+articles = ( 
+  [-5, 3, "deep-learning-article"], 
+  [-5, 2, "k-means-chapter"], 
+  [-6, 1, "machine-learnin-tutorial"],
+
+  [6, 3, "cupcakes"], 
+  [5, 2, "fast-spicy-food"], 
+  [5, 1, "asian-food"],
+
+  [-1, -5, "interest-rates"],
+  [ 0, -6, "crypto-currencies"],
+  [ 1, -4, "invest-stock"],
+)
+
+x = [ art[0] for art in articles ]
+y = [ art[1] for art in articles ]
+title = [ art[2] for art in articles ]
+
+plt.scatter(x, y)
+
+for idx in range(len(articles)):
+  art = articles[idx]
+  plt.text(art[0] + 0.5, art[1], art[2], ha='left')
+
+plt.xlim([-7, 10])
+plt.ylim([-7, 5])
+plt.show()
+```
 
 ## Conclusion
 
@@ -133,6 +170,3 @@ to be compared by distance to the document-category vectors.
 
 Another application is to detect plagiarism, by measuring the distance between a given input document to a 
 dataset of known documents.
-
-
-

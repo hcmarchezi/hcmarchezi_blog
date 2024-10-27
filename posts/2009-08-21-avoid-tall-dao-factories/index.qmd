@@ -9,20 +9,20 @@ A "tall" DAO factory can be defined as a big class that contains too
 much methods for each business class that compounds your domain model.  
   
 
-``` prettyprint
+```csharp
 public class DAOFactory
 {
-IClass1DAO GetClass1DAO() { ... }
-IClass2DAO GetClass2DAO() { ... }
-IClass3DAO GetClass3DAO() { ... }
-IClass4DAO GetClass4DAO() { ... }
-IClass5DAO GetClass5DAO() { ... }
-IClass6DAO GetClass6DAO() { ... }
-IClass7DAO GetClass7DAO() { ... }
-IClass8DAO GetClass8DAO() { ... }
-IClass9DAO GetClass9DAO() { ... }
-IClass10DAO GetClass10DAO() { ... }
-: : : :
+  IClass1DAO GetClass1DAO() { ... }
+  IClass2DAO GetClass2DAO() { ... }
+  IClass3DAO GetClass3DAO() { ... }
+  IClass4DAO GetClass4DAO() { ... }
+  IClass5DAO GetClass5DAO() { ... }
+  IClass6DAO GetClass6DAO() { ... }
+  IClass7DAO GetClass7DAO() { ... }
+  IClass8DAO GetClass8DAO() { ... }
+  IClass9DAO GetClass9DAO() { ... }
+  IClass10DAO GetClass10DAO() { ... }
+  : : : :
 }
 ```
 
@@ -34,10 +34,10 @@ In order to avoid that to happen, one good option is to use a generic
 method for all DAO interfaces.  
   
 
-``` prettyprint
+```csharp
 public class DAOFactory
 {
-ICommonDAO GetDAO < I > ( ) where I : ICommonDAO { ... }
+  ICommonDAO GetDAO < I > ( ) where I : ICommonDAO { ... }
 }
 ```
 

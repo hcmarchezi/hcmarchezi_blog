@@ -11,7 +11,7 @@ order to use it programmers have to make use of extension methods. And
 this kind of methods are not supported by Moq ( a minimalistic mock
 framework ). This is the DAO interface I want to test.
 
-``` prettyprint
+```csharp
 public interface IDAOFactory
 {
   public abstract IQueryable Query();
@@ -20,11 +20,12 @@ public interface IDAOFactory
 
 This is the moq unit test that fails, since I can´t use Linq directly.
 
-``` prettyprint
+```csharp
 [Test]
 public void LinqQueryTest()
 { 
-  // This moq configuration will trigger an exception – Can´t make use of extension methods
+  // This moq configuration will trigger an exception
+  // Can´t make use of extension methods
   daoFactoryMock.Setup(d => (from o in d.Query()
     where o.Id >= 0
     select o.Id).ToList())
@@ -35,7 +36,7 @@ public void LinqQueryTest()
 It turns out that the solution is easily solved by using a collection as
 a data source.
 
-``` prettyprint
+```csharp
 [Test]
 public void LinqQueryTest()
 {
@@ -50,7 +51,8 @@ public void LinqQueryTest()
   daoFactoryMock.Setup(d => d.Query()).Returns(orderQuery);
 
   // Now the linq queries can be used naturally 
-  IList lstResult = (from o in daoFactoryMock.Object.Query() where o.Id >= 0 Select o).ToList();
+  IList lstResult = (from o in daoFactoryMock.Object.Query() 
+                    where o.Id >= 0 Select o).ToList();
 
   // Checking output results
   Assert.AreEqual(3, lstResult.Count);

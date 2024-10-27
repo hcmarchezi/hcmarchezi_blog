@@ -12,32 +12,30 @@ programming.
 As the name stated, unit tests check the behaviour of the smaller part
 of an object what can be a constructor, method or property.  
 
-```
+```csharp
 [TestFixture]
-public class SomeTest
-{
-[Test]
-public void CheckDiscountCalculation()
-{
-Product prod1 = new Product("T-Shirt",125.0d); // description and price
-Product prod2 = new Product("Apple",10.0d);
-Product prod3 = new Product("Pants",50.0d);
+public class SomeTest {
+  [Test]
+  public void CheckDiscountCalculation() {
+    Product prod1 = new Product("T-Shirt",125.0d); // description and price
+    Product prod2 = new Product("Apple",10.0d);
+    Product prod3 = new Product("Pants",50.0d);
 
-OrderItem item1 = new OrderItem(prod1,1); // product and quantity
-OrderItem item2 = new OrderItem(prod2,1);
-OrderItem item3 = new OrderITem(prod3,1);
+    OrderItem item1 = new OrderItem(prod1,1); // product and quantity
+    OrderItem item2 = new OrderItem(prod2,1);
+    OrderItem item3 = new OrderITem(prod3,1);
 
-Client client = new Client("Jack");
+    Client client = new Client("Jack");
 
-Order order = new Order(client);
-order.AddItem(item1);
-order.AddItem(item2);
-order.AddItem(item3);
+    Order order = new Order(client);
+    order.AddItem(item1);
+    order.AddItem(item2);
+    order.AddItem(item3);
 
-decimal discount = order.CalculateDiscount();
+    decimal discount = order.CalculateDiscount();
 
-Assert.AreEqual(18.5d, discount);        
-}
+    Assert.AreEqual(18.5d, discount);        
+  }
 }
 ```
 
@@ -62,41 +60,40 @@ methods.
 The above test now can be rewritten like this:  
   
 
-```
+```csharp
 [TestFixture]
 public class SomeTest
 {
-[Test]
-public void CheckDiscountCalculation()
-{
-Mock prod1Mock = new Mock();
-prod1Mock.Setup(p=>p.Price).Returns(125.0d); // Ignores method implementation and returns 125.0d
+  [Test]
+  public void CheckDiscountCalculation()
+  {
+    Mock prod1Mock = new Mock();
+    // Ignores method implementation and returns 125.0d
+    prod1Mock.Setup(p=>p.Price).Returns(125.0d); 
 
-Mock prod2Mock = new Mock();
-prod2Mock.Setup(p=>p.Price).Returns(10.0d);
+    Mock prod2Mock = new Mock();
+    prod2Mock.Setup(p=>p.Price).Returns(10.0d);
 
-Mock prod3Mock = new Mock();
-prod3Mock.Setup(p=>p.Price).Returns(50.0d);
-
-
+    Mock prod3Mock = new Mock();
+    prod3Mock.Setup(p=>p.Price).Returns(50.0d);
 
 
-OrderItem item1 = new OrderItem(prod1,1); // product and quantity
-OrderItem item2 = new OrderItem(prod2,1);
-OrderItem item3 = new OrderITem(prod3,1);
+    // product and quantity
+    OrderItem item1 = new OrderItem(prod1,1);
+    OrderItem item2 = new OrderItem(prod2,1);
+    OrderItem item3 = new OrderITem(prod3,1);
 
-Client client = new Client("Jack");
+    Client client = new Client("Jack");
 
-Order order = new Order(client);
-order.AddItem(item1);
-order.AddItem(item2);
-order.AddItem(item3);
+    Order order = new Order(client);
+    order.AddItem(item1);
+    order.AddItem(item2);
+    order.AddItem(item3);
 
-decimal discount = order.CalculateDiscount();
+    decimal discount = order.CalculateDiscount();
 
-Assert.AreEqual(18.5d, discount);        
-}
+    Assert.AreEqual(18.5d, discount);        
+  }
 }
 ```
 
-</div>

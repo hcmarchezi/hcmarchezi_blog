@@ -18,29 +18,25 @@ I can enumerate the following advantages in using good packages for
 classes:  
   
 
--   It breaks the complexity of hundreds of classes in blocs composed by
-    few classes just like folders for files.
+-   It breaks the complexity of hundreds of classes in blocs composed by few classes just like folders for files.
 
-[<img src="http://4.bp.blogspot.com/_WHpubqoOAQY/SQyZN2CWskI/AAAAAAAAAog/CYr3mERWJPg/s400/Diagram1.png" id="BLOGGER_PHOTO_ID_5263750527612006978" />](http://4.bp.blogspot.com/_WHpubqoOAQY/SQyZN2CWskI/AAAAAAAAAog/CYr3mERWJPg/s1600-h/Diagram1.png)![](file:///C:/DOCUME%7E1/humberto/LOCALS%7E1/Temp/moz-screenshot.jpg)  
+![](Diagram1.png)
 
--   It gives a clue for developer about what is the role of this class
-    in the
-    system.[<img src="http://3.bp.blogspot.com/_WHpubqoOAQY/SQybgvOSJLI/AAAAAAAAAoo/olw5VBq1gK0/s400/Diagram1.png" id="BLOGGER_PHOTO_ID_5263753051223762098" />](http://3.bp.blogspot.com/_WHpubqoOAQY/SQybgvOSJLI/AAAAAAAAAoo/olw5VBq1gK0/s1600-h/Diagram1.png)
+-   It gives a clue for developer about what is the role of this class in the system.
 
-<div style="text-align: center;">
+![](Diagram1-1.png)
 
-The fully qualified name<span
-style="font-style: italic;">Finance.Sevices.DebtManagement </span>tell
-you what the class actually does.  
 
-</div>
+The fully qualified name *Finance.Sevices.DebtManagement* tell you what the class actually does.  
 
-  
 
 -   It organizes the logic architecture of your software. This is
     specially useful for layered architecture where the classes are
     organized according to the class
-    role.[<img src="http://4.bp.blogspot.com/_WHpubqoOAQY/SQ3_ResPdvI/AAAAAAAAAqQ/KBDk39V0TI8/s400/blog.png" id="BLOGGER_PHOTO_ID_5264144215227463410" />](http://4.bp.blogspot.com/_WHpubqoOAQY/SQ3_ResPdvI/AAAAAAAAAqQ/KBDk39V0TI8/s1600-h/blog.png)
+    role.
+
+![](blog.png)
+
 
 Organizing classes can also be confusing. In order to avoid wrong
 classification, the following anti-patterns are listed below:  
@@ -49,7 +45,7 @@ classification, the following anti-patterns are listed below:
 -   Packages with vagues names  
 
 One of the traps that should be avoided is to create packages with too
-vague names such as <span style="font-style: italic;">General,
+vague names such as *<span style="font-style: italic;">*General,
 </span><span style="font-style: italic;">Etc </span>or <span
 style="font-style: italic;">Miscellaneous. </span>This names are going
 to be used by lazy developers to place classes they don't want to think

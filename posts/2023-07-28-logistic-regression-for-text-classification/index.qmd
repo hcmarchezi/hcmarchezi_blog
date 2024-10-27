@@ -185,18 +185,21 @@ $$
 Gradient is calculated to adjust logistics-regression parameters during training (see flow below):
 
 
-`Repeat {`
-$\theta_j = \theta_j - \alpha \frac{\partial }{\partial \theta_j} J(\theta)$
-`}`
+$$
+Repeat \{
+\theta_j = \theta_j - \alpha \frac{\partial }{\partial \theta_j} J(\theta)
+\}
+$$
 
 
 For all $j$, calculate derivatives:
 
 
-`Repeat {`
-$\theta_j = \theta_j - \frac{\alpha}{m} \sum_{i=1}^{m} (h(x^{(i)}, \theta) - y^{(i)}) x_j^{(i)}$
-`}`
-
+$$
+Repeat \{
+\theta_j = \theta_j - \frac{\alpha}{m} \sum_{i=1}^{m} (h(x^{(i)}, \theta) - y^{(i)}) x_j^{(i)}
+\}
+$$
 
 Derivative calculation can be summarized as: (with vectors)
 

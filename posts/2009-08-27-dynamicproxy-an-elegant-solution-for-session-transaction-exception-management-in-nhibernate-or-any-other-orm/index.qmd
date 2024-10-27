@@ -27,7 +27,7 @@ The idea can be coded in the following way:
   
   
 
-``` prettyprint
+```csharp
 namespace Sample.Service
 {
   public class SystemLogRegistrationService
@@ -69,8 +69,8 @@ necessary aspects such as session/transaction management and exception
 handling or any other aspect you might think about.  
   
 
-``` brush:csharp
-SomeService serv = ProxyGenerator.InjectSessionTransactionExceptionAspects &lt SomeService &gt ();
+```csharp
+SomeService serv = ProxyGenerator.InjectSessionTransactionExceptionAspects<SomeService>();
 serv.Modify(12048); // <= Modify method has session/transaction/exception management
 ```
 
@@ -78,7 +78,7 @@ serv.Modify(12048); // <= Modify method has session/transaction/exception manage
 
 The proxy generator can be implemented using Castle Dynamic Proxy API.  
 
-``` prettyprint
+```csharp
 using System;
 using Castle.DynamicProxy;
 
@@ -87,7 +87,7 @@ namespace Sample.Persistence
   public static class ProxyGenerator 
   {
     private static ProxyGenerator _generator = new ProxyGenerator();        
-    public static TService InjectSessionTransactionExceptionAspects &lt TService &gt ()
+    public static TService InjectSessionTransactionExceptionAspects<TService>()
     {
       return (TService)_generator.CreateClassProxy(
         typeof(TService),
@@ -99,7 +99,7 @@ namespace Sample.Persistence
 
 -   **An interceptor for the service class methods**
 
-``` prettyprint
+```csharp
 using System;
 using Castle.DynamicProxy;
 using NHibernate;

@@ -14,7 +14,7 @@ so that command-line MSBuild will take care of publication configuration
 in a NAnt script. After some full-days of research, I found the solution
 below. I hope it helps in your project.
 
-``` prettyprint
+```xml
 <exec program="${dotnetFrameworkDir}\MSBuild.exe">
   <arg value="${basePath}\MyProject\MyProject.csproj"></arg>
   <arg value="/target:publish"></arg>

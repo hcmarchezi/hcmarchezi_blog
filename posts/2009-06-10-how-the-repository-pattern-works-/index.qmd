@@ -18,14 +18,16 @@ have a name and an address (there may be more information but lets stay
 with those two data for simplification purposes).  
 So, this could be instantiated like: (C\# code)  
 
-    // Open database connection (and Begin Transaction)
-    SessionManager.Open( );
-    : : :
-    // Parameters are: name, zipcode, adress number, address complement, country
-    Client client = new Client(“New Client”,”12500”,12,“Room 14”,Country.US);
-    : : :
-    // Close database connection (and Commit Transaction)
-    SessionManager.Close( );
+```csharp
+// Open database connection (and Begin Transaction)
+SessionManager.Open( );
+: : :
+// Parameters are: name, zipcode, adress number, address complement, country
+Client client = new Client(“New Client”,”12500”,12,“Room 14”,Country.US);
+: : :
+// Close database connection (and Commit Transaction)
+SessionManager.Close( );
+```
 
   
 Although simple, the line above hides many steps such as:  
@@ -68,62 +70,64 @@ style="font-style: italic;">Client clas</span>s must be implemented.
   
 See full code listing below:  
 
-    // Address is a value object used by Client class
-    public class Address
-    {
-         public Address(string zipCodeNumber,int number,string addrComplement)
-         {
-                // Check if zipcode number exists in the country  (ZipCode Repository uses SessionManager inside it)
-                IZipCodeRepository zipCodeRepository = RepositoryManager.GetRepository( );
-                ZipCode zipCode = zipCodeRepository.Get(zipCodeNumber,country);
-                if (zipCode == null) { throw new NonExistentZipCodeException(zipCodeNumber,country);
-                // Check if address number is correct
-                if  (number <= 0) { throw new InvalidAddressNumberException(number); }               
-                // Check if address complement is correct
-                if (complement.Trim( ) == string.Empty) { throw new  InvalidAddressComplementException(addrComplement)); }
-                // Sets values
-           this._zipCode = zipCode;
-           this._number = number;
-                this._complement = complement;
-         }
-         private ZipCode _zipCode = null;
-         public ZipCode ZipCode get { return _zipCode; }
-         private int _number = 0;
-         public int Number { get { return _number; } }
-         private string _complement = string.Empty;
-         public string Complement { get { return _complement; } }
-    }
+```csharp
+// Address is a value object used by Client class
+public class Address
+{
+  public Address(string zipCodeNumber,int number,string addrComplement)
+  {
+    // Check if zipcode number exists in the country
+    // (ZipCode Repository uses SessionManager inside it)
+    IZipCodeRepository zipCodeRepository = RepositoryManager.GetRepository( );
+    ZipCode zipCode = zipCodeRepository.Get(zipCodeNumber,country);
+    if (zipCode == null) { throw new NonExistentZipCodeException(zipCodeNumber,country);
+    // Check if address number is correct
+    if  (number <= 0) { throw new InvalidAddressNumberException(number); }               
+    // Check if address complement is correct
+    if (complement.Trim( ) == string.Empty) { throw new  InvalidAddressComplementException(addrComplement)); }
+    // Sets values
+    this._zipCode = zipCode;
+    this._number = number;
+    this._complement = complement;
+  }
+  private ZipCode _zipCode = null;
+  public ZipCode ZipCode get { return _zipCode; }
+  private int _number = 0;
+  public int Number { get { return _number; } }
+  private string _complement = string.Empty;
+  public string Complement { get { return _complement; } }
+}
 
-    // Now the Client class
-    public class Client
+// Now the Client class
+public class Client
+{
+  private long _id;
+  public long Id { get { return id; } set { this.id = value; } }
+  private string _name = string.Empty;
+  public Name
+  {        
+    get { return _name; }  
+    // Check if name is valid    
+    set
     {
-         private long _id;
-         public long Id { get { return id; } set { this.id = value; } }
-         private string _name = string.Empty;
-         public Name
-         {        
-                get { return _name; }  
-                // Check if name is valid    
-                set
-                {
-                       if (name.Trim( ) == string.Empty) { throw new InvalidNameException(); }               
-                       // Check if there are Clients with same name and address               
-                       IClientRepository clientRepository = RepositoryManager.GetRepository();
-                       bool exists = clientRepository.ClientExists(name,zipCodeNumber,number,addrComplement,country);
-                       if (exists) { throw new ClientExistsException( ); }
-                       this._name = value;         
-                    
-                 }
-         }
-         private Address _address;
-         public Address { get { return _address; } }
-         public Client(string name,string zipCodeNumber,int number,string addrComplement,Country country)
-         {       
-                 // Creates a Client
-                 this.Address = new Address(zipCodeNumber,number,addrComplement,country);
-                 this.Name = name;     
-          }
-    }
+      if (name.Trim( ) == string.Empty) { throw new InvalidNameException(); }               
+      // Check if there are Clients with same name and address               
+      IClientRepository clientRepository = RepositoryManager.GetRepository();
+      bool exists = clientRepository.ClientExists(name,zipCodeNumber,number,addrComplement,country);
+      if (exists) { throw new ClientExistsException( ); }
+      this._name = value;         
+     }
+  }
+  private Address _address;
+  public Address { get { return _address; } }
+  public Client(string name,string zipCodeNumber,int number,string addrComplement,Country country)
+  {       
+    // Creates a Client
+    this.Address = new Address(zipCodeNumber,number,addrComplement,country);
+    this.Name = name;     
+  }
+}
+```
 
   
 Repositories have at least two advantages:  

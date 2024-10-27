@@ -44,31 +44,32 @@ got to the idea below:
 For a Client Registration use case we could have the following unit
 tests:  
 
-    [TestFixture][BusinessRules] // Business rule attribute means this test must be documented
-    class Client_Registration_Use_Case
-    { 
-       [Test]
-       void Normal_Flow__Check_if_name_is_not_null() { ... }
+```csharp
+[TestFixture][BusinessRules] // Business rule attribute means this test must be documented
+class Client_Registration_Use_Case
+{ 
+   [Test]
+   void Normal_Flow__Check_if_name_is_not_null() { ... }
 
-       [Test]
-       void Normal_Flow__Check_if_address_is_valid() { ... }
+   [Test]
+   void Normal_Flow__Check_if_address_is_valid() { ... }
 
-       [Test]
-       void Normal_Flow__Check_if_there_is_another_client_with_same_name() { ... }
+   [Test]
+   void Normal_Flow__Check_if_there_is_another_client_with_same_name() { ... }
 
-       [Test]
-       void Normal_Flow__Save_New_Client() { ... }
+   [Test]
+   void Normal_Flow__Save_New_Client() { ... }
 
-       [Test ExpectedException(typeof(NullClientNameException)) ]
-       void Alternative_Flow__If_client_name_is_null_raise_message_to_the_user() { ... }
+   [Test ExpectedException(typeof(NullClientNameException)) ]
+   void Alternative_Flow__If_client_name_is_null_raise_message_to_the_user() { ... }
 
-       [Test ExpectedException(typeof(InvalidClientAddressException)) ]
-       void Alternative_Flow__If_client_address_is_invalid_raise_message_to_the_user() { ... }
+   [Test ExpectedException(typeof(InvalidClientAddressException)) ]
+   void Alternative_Flow__If_client_address_is_invalid_raise_message_to_the_user() { ... }
 
-       [Test ExpectedException(typeof(ClientNameAlreadyExistsException)) ]
-       void Alternative_Flow__If_another_client_with_the_same_name_was_found_raise_message_to_the_user() { ... }
-    }
-
+   [Test ExpectedException(typeof(ClientNameAlreadyExistsException)) ]
+   void Alternative_Flow__If_another_client_with_the_same_name_was_found_raise_message_to_the_user() { ... }
+}
+```
   
   
 At the end, a script in the continuous integration process can read this
