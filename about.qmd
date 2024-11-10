@@ -1,6 +1,6 @@
 ---
 title: "About"
-image: profile.jpg
+image: profile_photo.jpg
 about:
   template: jolla
   links:
@@ -16,4 +16,10 @@ about:
 
 ---
 
-About this blog
+Hi, I've worked as Software Engineer, Data Scientist and Data Engineering
+since 2002 I worked in different industries and programming languages.
+
+This blog is a space for me to explain concepts as well as share my ideas
+and opnions.
+
+Please comment ! 
