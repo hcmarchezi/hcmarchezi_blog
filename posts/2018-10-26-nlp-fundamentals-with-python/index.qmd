@@ -1,0 +1,209 @@
+---
+title: "NLP Fundamentals with Python"
+author: "Humberto C Marchezi"
+date: "2018-10-26"
+categories: [machine-learning]
+description: Fundamental NLP tools for python
+---
+
+# NLP Fundamentals in Python
+
+Working with natural language involves being able to extract, treat and break down text into a list
+of relevant words to be processed. 
+
+Below is a list of must-know libraries in Python for that purpose.
+
+## Regular expressions
+
+[Regular expressions](https://www.regular-expressions.info/) are a classical way to extract word classes or symbols from classes with a well-known metalanguage that describes which symbols to match and or replace.
+
+This can be achieved by "re" python library.
+
+```python
+import re
+
+re.findall(r'\sa[a-z]*', 'carlos arthur jack amanda') # ==> ['arthur', 'amanda']
+
+m = re.search(r'\sa[a-z]*', 'carlos arthur') # ==> <re.Match object; span=(6, 13), match=' arthur'>
+
+re.match(r'\sa[a-z]*', 'carlos arthur jack amanda')
+
+re.split(r'[0-9]+', 'carlos00arthur11jack') # ==> ['carlos', 'arthur', 'jack']
+```
+
+
+## Tokenization
+
+Tokenization is the process of breaking down a text of body into sentences and then sentences into words.
+
+"nltk" is a library specialized in just that.
+
+```python
+import nltk # Python for NLP tokenization
+from nltk.tokenize import TweetTokenizer
+
+nltk.download('punkt_tab')
+
+sentence = "Hello everyone! \nHow are you?\n Tomorrow."
+
+nltk.word_tokenize(sentence) # ==> ['Hello', 'everyone', '!', 'How', 'are', 'you', '?', 'Tomorrow', '.']
+
+nltk.sent_tokenize(sentence) # ==> ['Hello everyone!', 'How are you?', 'Tomorrow.']
+
+tweet = '@aminbaybon please dont stop'
+tokenizer = TweetTokenizer() # tweet tokenizer
+tokenizer.tokenize(tweet)  # ==> ['@aminbaybon', 'please', 'dont', 'stop']
+```
+
+## Word count with bag of words
+
+After extracting words from sentence, word frequency needs to be counted with "Counter" library. 
+
+```python
+from collections import Counter 
+
+word_list = ['you', 'are', 'not', 'here', 'and', 'you', 'are', 'my', 'friend']
+
+word_freq = Counter(word_list) # --- produces ---> list of tuples, (word, frequency)
+word_freq.most_common(10) # ----> 10 most common tokens
+```
+
+## Word Pre-processing
+
+As part of text body preprocessing, words should be processed and sometimes convert to a common root.
+
+This is to avoid variability such as in "play", "plays" or in "player" and "players".
+
+NLTK offers support for that type of processing as well.
+
+```python
+from nltk.stem import WordNetLemmatizer # -> convert words to its common root
+
+nltk.download('wordnet') ### --> initializing nltk with vocabulary database
+
+wnl = WordNetLemmatizer()
+wnl.lemmatize('play')    # --> play
+wnl.lemmatize('plays')   # --> play
+wnl.lemmatize('player')  # --> player
+wnl.lemmatize('players') # --> players
+```
+
+
+```python
+from gensim.corpora.dictionary import Dictionary # - Dictionary (word -> freq)
+dict = Dictionary(list_of_documents)
+
+for document in documents:
+    bag_of_words = dict.doc2bow(document) # list of tuples (key, value) where key is a word id number and value is frequency
+```
+
+### TF-IDF
+
+TF-IDF stands for **term frequency - inverse document frequency** and it is a way to
+reduce the importance of too common words among documents while increase importance of unique / rare ones.
+
+TF-IDF can be described with the following formula:
+
+```
+Given document i and term j, tf-idf is given by:
+    tfidf_i_j = (term i % in doc j) * log(number_of _docs / number_of_docs_with_term_i)
+```
+
+Below is an exemple of TF-IDF processing with gensin library: 
+
+```python
+from gensim.models.tfidfmodel import TfidfModel
+
+tfidf = TfidfModel(corpus)
+word_weights = tfidf[doc] # list of tuples (word id, tfidf weight)
+```
+
+## Named Entity Recognition
+
+Named entity recognition is a task to identity important named entities
+such as people names, states, organizations, places, etc.
+
+Installation requires Java Stanford NLP and env variables configurations
+
+### NLTK example
+
+```python
+import nltk
+
+pos_sentences = [nltk.tag.pos_tag(sentence) for sentence in token_sentences] # tag each token as named entity
+chunked_sentences = nltk.chunk.ne_chunk_sents(pos_sentences, binary=True) # tag each token as named entity: 
+for each chunk in chunked_sentences:  
+    if hasattr(chunk, "label") and chunk.label() == "NE": # check for label method and value “NE”
+        print(chunk)
+```
+
+
+### SpaCy example
+
+```python
+import spacy # library
+
+nlp = spacy.load('en', tagger=False, parser=False, matcher=False) # load library vocabulary
+doc = nlp(article) # load article 
+for ent in doc.ents:  # check recognized entities in text 
+    print(ent.label_, ent.text) # print corresponding category (person, location, etc.)
+```
+
+PS: each word is a pre-trained embedding from a vocabulary
+
+## Word Processing with sklearn
+
+Sklearn offers support to process words or build classifiers.
+
+Word vectorizers offers different options to process and score idenfified words from a text.
+
+Below there are 2 code examples to illustrate each option.
+
+### Count Vectorizer
+
+This is the simplest vectorizer, each word is identified and corresponding frequency is counted.
+
+```python
+from sklearn.feature_extraction.text import CountVectorizer
+
+count_vectorizer = CountVectorizer(stop_words='english')
+count_vectorizer.get_feature_names() # list of feature names (words)
+```
+
+### TF-IDF Vectorizer
+
+With TF-IDF (term frequency - inverse document frequency) the score (frequency) also depends on how rare a word is.
+
+See section above on TF-IDF details.
+
+```python
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+tfidf_vectorizer = TfidfVectorizer(stop_words='english', max_df=0.7)
+tfidf_train = tfidf_vectorizer.fit_transform(X_train)
+tfidf_test = tfidf_vectorizer.transform(X_test)
+tfidf_vectorizer.get_feature_names() # ---> list of feature names
+```
+
+### Text Classification with Multinomial Naive Bayes
+
+A text classifier can be trained and measured with sklearn with a few lines of code.
+
+```python
+from sklearn.naive_bayes import MultinomialNB
+from sklearn import metrics
+
+nb_classifier = MultinomialNB()
+nb_classifier.fit(tfidf_train, y_train)
+pred = nb_classifier.predict(tfidf_test)
+score = metrics.accuracy_score(y_test, pred)
+cm = metrics.confusion_matrix(y_test, pred, labels=['FAKE', 'REAL'])
+```
+
+## Conclusion
+
+There are several libraries in python to take care of tokenizing or processing extracted words 
+as well as extract the frequency of words or rank its importance based on a mechanism such as "tf-idf".
+
+This vairety of libraries added with simplicity,makes python the preferred choice of programming language for such type of work.
+
