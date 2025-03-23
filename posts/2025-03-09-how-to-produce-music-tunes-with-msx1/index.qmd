@@ -1,0 +1,414 @@
+---
+title: "How to Produce Music Tunes in MSX1"
+author: "Humberto C Marchezi"
+date: "2024-03-09"
+categories: [retro-computing, MSX]
+description: Describes how to efficiently play game sound track with MSX1
+execute:
+  echo: false
+---
+
+## Introduction
+
+The sound generator contained in the MSX1 computer is called PSG (programmable sound generator) and it is
+composed by 3 tone generators + 1 white noise generator. 
+
+## Programming PSG
+
+PSG is controlled via its registers which serve as an interface to communicate with the sound generator.
+
+| Register | Description                                   | Values   |
+| :------- | :-------------------------------------------- | :------- |
+| 0        | Least significant bits of channel A frequency | 0\~255   |
+| 1        | Most significant bits of channel A frequency  | 0\~15    |
+| 2        | Least significant bits of channel B frequency | 0\~255   |
+| 3        | Most significant bits of channel B frequency  | 0\~15    |
+| 4        | Least significant bits of channel C frequency | 0\~255   |
+| 5        | Most significant bits of channel C frequency  | 0\~15    |
+| 6        | Noise generator frequency                     | 0\~31    |
+| 7        | Mixer setting                                 | 128\~191 |
+| 8        | Volume of channel A                           | 0\~16    |
+| 9        | Volume of channel B                           | 0\~16    |
+| 10       | Volume of channel C                           | 0\~16    |
+| 11       | Least significant bits of envelope period     | 0\~255   |
+| 12       | Most significant bits of envelope period      | 0\~255   |
+| 13       | Envelope shape                                | 0\~15    |
+
+### Mixer Setting Register 
+
+Mixer is controlled by setting a byte value to register 7 where each bit can enable or disable tone generator or white noise generator per channel.
+
+| Bit  | Description              | Channel | 
+| :--: | :----------------------- | :-----: |
+|  7   | PSG I/O ports (always 1) | X       |
+|  6   | PSG I/O ports (always 0) | X       |
+|  5   | Disabling noise          | C       |
+|  4   | Disabling noise          | B       |
+|  3   | Disabling noise          | A       |
+|  2   | Disabling tone           | C       |
+|  1   | Disabling tone           | B       |
+|  0   | Disabling tone           | A       |
+
+**PS:** Bit 7 should be set to 1 and Bit 6 to 0 to avoid joystick malfunction
+
+### Setting Envelope Shape
+
+Envelope shape is about the sound shape over time. Without an envelope shape, when any produced sound would sustain indefinitely while
+with envelope, the produced sound could be programmed to fade in or fade out or perhaps follow a repetitive envelope pattern.
+
+Configuring envelope shape involves 2 parts:
+
+* select an envelope shape 
+* set envelope frequency or length
+
+Register 13 sets the envelope shape into one of the following shape options:
+
+| Value | Shape          |
+| :---- | :------------  |
+| 0~3   | ＼＿＿＿＿＿＿＿ |
+| 4~7   | ／＿＿＿＿＿＿＿ | 
+| 8     | ＼＼＼＼＼＼＼＼ |
+| 9     | ＼＿＿＿＿＿＿＿ |
+| 10    | ＼／＼／＼／＼／ |
+| 11    | ＼￣￣￣￣￣￣￣ |
+| 12    | ／／／／／／／／ |
+| 13    | ／￣￣￣￣￣￣￣ |
+| 14    | ／＼／＼／＼／＼ |
+| 15    | ／＿＿＿＿＿＿＿ |
+
+Registers 12 and 11 store 8-bit values but they are combined to represent a 16-bit value for the frequency.
+Therefore the frequency value 0x123F is composed by setting 0x12 to register 12 and 0x3F to register 11.
+
+**PS:** Note that the envelope will take effect on a channel only if the bit 4 in the channel's volume register is set. In other words, the volume should be set to 16.
+
+## Music Tune with PSG Sound Generator
+
+In each PSG channel, a tone frequency is defined by 12 bits stored in 2 registers of 1 byte where 4 bits are stored in most significative register while 8 bits is stored in the least significative register.
+
+However for the purpose of music soundtrack, each frequency can to be mapped to a musical note as in the table below:
+
+| Octave   |       |       |       |        |       |       |       |       |
+| -----    | :---- | :---- | :---- | :----  | :---- | :---- | :---- | :---- |
+| **Note** | **1** | **2** | **3** | **4**  | **5** | **6** | **7** | **8** |
+| C        | 0xD5D | 0x6AF | 0x357 | 0x1AC  | 0x0D6 | 0x06B | 0x035 | 0x01B |
+| C\#      | 0xC9C | 0x64E | 0x327 | 0x194  | 0x0CA | 0x065 | 0x032 | 0x019 |
+| D        | 0xBE7 | 0x5F4 | 0x2FA | 0x17D  | 0x0BE | 0x05F | 0x030 | 0x018 |
+| D\#      | 0xB3C | 0x59E | 0x2CF | 0x168  | 0x0B4 | 0x05A | 0x02D | 0x016 |
+| E        | 0xA9B | 0x54E | 0x2A7 | 0x153  | 0x0AA | 0x055 | 0x02A | 0x015 |
+| F        | 0xA02 | 0x501 | 0x281 | 0x140  | 0x0A0 | 0x050 | 0x028 | 0x014 |
+| F\#      | 0x973 | 0x4BA | 0x25D | 0x12E  | 0x097 | 0x04C | 0x026 | 0x013 |
+| G        | 0x8EB | 0x476 | 0x23B | 0x11D  | 0x08F | 0x047 | 0x024 | 0x012 |
+| G\#      | 0x86B | 0x436 | 0x21B | 0x10D  | 0x087 | 0x043 | 0x022 | 0x011 |
+| A        | 0x7F2 | 0x3F9 | 0x1FD | 0x0FE\*| 0x07F | 0x040 | 0x020 | 0x010 |
+| A\#      | 0x780 | 0x3C0 | 0x1E0 | 0x0F0  | 0x078 | 0x03C | 0x01E | 0x00F |
+| B        | 0x714 | 0x38A | 0x1C5 | 0x0E3  | 0x071 | 0x039 | 0x01C | 0x00E |
+
+**ref:** [https://www.msx.org/wiki/SOUND](https://www.msx.org/wiki/SOUND) 
+
+### Produce a Simple Sound Tone
+
+In order to be able to listen to some tone from a MSX channel, the following is necessary:
+
+* **Tone frequency** - 12 bits value combined from the most significant and the least significant registers
+* **Sound volume** - values ranging from 0 to 15 or 16 (to enable sound envelope)
+* **Mixer setting** - enable or disable channel sound tone or white noise
+* **Envelope shape** - establishes sound envelope such as a short sound, continuous, fade-in, fade-out, etc.
+
+Example below produces a tone for channel A in MSX BASIC for demonstration:
+
+| PSG register | Value      | Comment                      |
+| :----------: | :--------- | :--------------------------- |
+| 7            | &B10111000 | Disable noise, enable tone   |
+| 13           | &H01       | Fade out envelope shape      |
+| 12           | &H13       | Most signif envelope value   |
+| 11           | &H88       | Least signif envelope value  |
+| 1            | &H00       | Most signif tone freq value  |
+| 0            | &HFE       | Least signif tone freq value |
+| 8            | &B00010000 | Volume associate to envelope |
+
+```basic
+10 REM enable ch A tones with mixer 
+20 SOUND 7, &B10111000
+30 REM set short envelope period
+40 SOUND 13, 1
+50 SOUND 12, &H13: SOUND 11, &H88 
+60 REM tone A4 for channel A
+70 SOUND 1, &H00
+80 SOUND 0, &HFE
+85 REM associate volume to envelope
+90 SOUND 8, 16
+```
+
+### Producing White Noise with PSG
+
+PSG should be programmed the following way, in order to produce white noise:
+
+* Set white noise frequency value to register 6 with values ranging 0 to 31 (5 least significative bits)
+* Set mixer to enable noise with register 7
+* Set volume and envelope shape to prevent indefinite noise
+
+| PSG register | Value      | Comment                      |
+| :----------: | :--------- | :--------------------------- |
+| 7            | &B10110001 | Enable noise for channel C   |
+| 13           | &H01       | Fade out envelope shape      |
+| 12           | &H13       | Most signif envelope value   |
+| 11           | &H88       | Least signif envelope value  |
+| 6            | 20         | Most signif tone freq value  |
+| 10           | &B00010000 | Volume associate to envelope |
+
+
+```basic
+10 REM enable noise for ch C
+20 SOUND 7, &B10110001 
+30 REM set envelope shape
+40 SOUND 13, 1
+50 SOUND 12, &H13: SOUND 11, &H88 
+60 REM set white noise frequency
+70 SOUND 6, 20
+80 REM associate volume to envelope
+90 SOUND 10, 16
+```
+
+**PS:** It is perfectly possible to enable tone and noise at the same time for a channel. Effectively noise can controlled as a 4th channel and several games use the white noise as a cymbal or drum effect in the game soundtrack.
+
+## Effectively Composing Soundtracks for Game
+
+The size of background music depends on how elaborate the sound track is. 
+Typically, for a decent  soundtrack, 2 channels are used to build it.
+
+
+In average, a soundtrack contains something about 128 notes (8 notes * 16 bars), therefore the byte size estimation is:
+
+* 8 notes * 16 bars * 2 bytes channel A * 2 bytes channel B = 512 bytes
+
+However 512 bytes is a considerable size considering a multi-level game what opens opportunities to reduce soundtrack memory size. 
+
+### Reducing Memory Space with Optimal Tune Range
+
+1 byte per music note can be used instead of 2 bytes if a specific music frequency range is carefully chosen for the melody and bass channels.  
+
+Considering the frequency table of frequencies and music notes, the following music note ranges can be recommended:
+
+| description    | most significant fixed value  | starting note | final note   |
+| :------------- | :---------------------------- | :------------ | :----------- |
+| bass channel   | 0x1                           | 0xFD (A3)     | 0x0D (G\#4)  |
+| melody channel | 0x0                           | 0xFE (A4)     | 0x0E (B8)    |
+
+
+Using those frequency ranges above, the most significant register can be set to a fixed value while the least significant value
+can be variate within a single byte therefore saving precious MSX memory for the game.
+
+The BASIC program below demonstrate this concept more clearly with a real example:
+
+```
+10 SOUND 1, &H01 'PSG channel A - bass
+20 SOUND 3, &H00 'PSG channel B - melody
+
+50 REM SOUNDTRACK BYTES
+51 REM 1st BYTE is BASS - channel A
+52 REM 2nd BYTE is MELODY - channel B
+55 REM 64 BYTES FOR THIS MICRO SONG
+
+60 DATA &HAC,&HD6,&HAC,&HAA,&HAC,&H8F,&HAC,&H7F
+61 DATA &H68,&H78,&H68,&H78,&H68,&H78,&H68,&H78 
+62 DATA &H40,&H7F,&H40,&H7F,&H40,&H7F,&H40,&H7F
+63 DATA &HAC,&H8F,&HAC,&H8F,&HAC,&H8F,&HAC,&H8F
+64 DATA &HAC,&HD6,&HAC,&HAA,&HAC,&H8F,&HAC,&H7F
+65 DATA &H68,&H78,&H68,&H78,&H68,&H78,&H68,&H78 
+66 DATA &H40,&H7F,&H40,&H7F,&H40,&H7F,&H40,&H7F
+67 DATA &HAC,&H6B,&HAC,&H6B,&HAC,&H6B,&HAC,&H6B
+
+100 PRINT "PLAY MUSIC"
+110 SOUND 8,12: SOUND 9, 12 'set volume
+120 FOR I = 1 to 32 'read tones
+130 READ A: SOUND 0, A
+140 READ B: SOUND 2, B
+145 PRINT "SOUND 0, " + HEX$(A) + " SOUND 2, " + HEX$(B)
+150 FOR TT = 1 to 90: NEXT TT 'delay workaround
+160 NEXT I
+170 SOUND 8,0: SOUND 9,0 'turn off vol
+```
+
+### Add Duration to Music Tone
+
+With a naive approach, each music note can be stored with frequency (2 bytes) and duration (1 byte), therefore occupying 3 bytes. 
+However 3 bytes per music tone is too much space for the limited memory of MSX !
+
+| A \- freq hi | A \- freq low | A \- duration | B \- freq hi | B \- freq low | B \- duration |
+| :----------- | :------------ | :------------ | :----------- | :------------ | :------------ |
+| 0            | D6 (C)        | 100           | 1            | AC (C)        | 200           |
+| 0            | BE (D)        | 100           | 1            | AC (C)        | 200           |
+| 0            | AA (E)        | 100           | 1            | 1D (G)        | 200           |
+| 0            | 8F (G)        | 100           | 1            | 1D (G)        | 200           |
+
+
+#### Option 1 - Use Optimal Tune Range with Duration
+
+With optimal note range explained in previous section, the table becomes smaller.
+
+This way music table can store bass tones and melody tones separately with 1 byte (instead of 2 bytes) and their respective duration with another byte.
+
+Such as:
+
+* set channel B most significative tone to 0
+* set channel A most significative tone to 1
+
+| B \- freq low | B \- duration | A \- freq low | A \- duration |
+| :------------ | :------------ | :------------ | :------------ |
+| D6 (C)        | 100           | AC (C)        | 200           |
+| BE (D)        | 100           | AC (C)        | 200           |
+| AA (E)        | 100           | 1D (G)        | 200           |
+| 8F (G)        | 100           | 1D (G)        | 200           |
+
+A program can use duration as a loop counter before moving on to the next music note.
+
+```c
+/* least significative tune channel A */
+unsigned char least_signif_tune_channel_a[]  = [ 0xAC, 0x68, 0x78, 0xAC, ... ];
+/* channel A duration */
+unsigned char duration_channel_a[] = [ 0x04, 0x04, 0x04, 0x04, ... ]; 
+
+/* least significative tune channel B */
+unsigned char least_signif_tune_channel_b[]  = [ 0xD6, 0xAA, 0x8F, 0x7F, ... ];
+/* channel B duration */
+unsigned char duration_channel_b[] = [ 0x01, 0x01, 0x01, 0x01, ... ]; 
+
+unsigned char channel_a_counter = 0;
+unsigned char channel_b_counter = 0;
+unsigned char channel_a_tune_idx = 0;
+unsigned char channel_b_tune_idx = 0;
+unsigned char channel_a_size = ...;
+unsigned char channel_b_size = ...;
+
+
+while game_loop {
+  channel_a_counter--;
+  channel_b_counter--;
+
+  if (channel_a_counter < 0) {
+    channel_a_tune_idx++;
+    /* Get duration for channel A */
+    channel_a_counter = duration_channel_a[channel_a_tune_idx];
+    /* Play tune in channel A */
+    play_channel_a(0x01, least_signif_tune_channel_a);
+  }
+
+  if (channel_b_counter < 0) {
+    channel_b_tune_idx++;
+    /* Get duration for channel B */
+    channel_b_counter = duration_channel_b[channel_b_tune_idx];
+    /* Play tune in channel B */
+    play_channel_b(0x00, least_signif_tune_channel_b);
+  }
+
+  if (channel_a_tune_idx > channel_a_size) {
+    channel_a_tune_idx = 0;
+    channel_a_counter = most_tune_duration_channel_a[channel_a_tune_idx] / 16;
+  }
+
+  if (channel_b_tune_idx > channel_b_size) {
+    channel_b_tune_idx = 0;
+    channel_b_counter = most_tune_duration_channel_a[channel_b_tune_idx] / 16;
+  }
+
+}
+```
+
+#### Option 2 - Use 1 Byte to Store Both Duration and Most Significative Tune 
+
+The PSG registers responsible for the most signiticative tune, make use of only 4 bits, therefore leaving other 4 bits available for other uses such as duration.
+
+* storage of most-significative register
+
+| bit 7    | bit 6    | bit 5    | bit 4    | bit 3    | bit 2    | bit 1    | bit 0    |
+| :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | 
+| X        | X        | X        | X        | tune     | tune     | tune     | tune     |
+
+The idea here is to use 1 byte for the least significative tune information while optimising the use of the next byte to store: most significative tune and duration.
+
+* 1 byte to store least significative tune bits
+
+| bit 7    | bit 6    | bit 5    | bit 4    | bit 3    | bit 2    | bit 1    | bit 0    |
+| :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | 
+| tune     | tune     | tune     | tune     | tune     | tune     | tune     | tune     |
+
+* 1 byte to store both most significative tune bits + duration
+
+| bit 7    | bit 6    | bit 5    | bit 4    | bit 3    | bit 2    | bit 1    | bit 0    |
+| :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | 
+| duration | duration | duration | duration | tune     | tune     | tune     | tune     |
+
+The C code below demonstrates how this could be implemented.
+
+```c
+/* least significative tune channel A */
+unsigned char least_signif_tune_channel_a[]  = [ 0xAC, 0x68, 0x78, 0xAC, ... ];
+/* most significative tune channel A + duration */
+/* PS: 0x41 => duration=0x4 and tune=0x1        */
+unsigned char most_tune_duration_channel_a[] = [ 0x41, 0x41, 0x41, 0x41, ... ]; 
+
+/* least significative tune channel B */
+unsigned char least_signif_tune_channel_b[]  = [ 0xD6, 0xAA, 0x8F, 0x7F, ... ];
+/* most significative tune channel B + duration */
+/* PS: 0x10 => duration=0x1 and tune=0x0        */
+unsigned char most_tune_duration_channel_b[] = [ 0x10, 0x10, 0x10, 0x10, ... ]; 
+
+unsigned char channel_a_counter = 0;
+unsigned char channel_b_counter = 0;
+unsigned char channel_a_tune_idx = 0;
+unsigned char channel_b_tune_idx = 0;
+unsigned char channel_a_size = ...;
+unsigned char channel_b_size = ...;
+
+
+while game_loop {
+  channel_a_counter--;
+  channel_b_counter--;
+
+  if (channel_a_counter < 0) {
+    channel_a_tune_idx++;
+    /* Divide by 16 to extract duration from byte */
+    channel_a_counter = most_tune_duration_channel_a[channel_a_tune_idx] / 16;
+    /* Get remaining from division by 16 to extract most significative tune info */
+    play_channel_a(most_tune_duration_channel_a % 16, least_signif_tune_channel_a);
+  }
+
+  if (channel_b_counter < 0) {
+    channel_b_tune_idx++;
+    /* Divide by 16 to extract duration from byte */
+    channel_b_counter = most_tune_duration_channel_b[channel_b_tune_idx] / 16;
+    /* Get remaining from division by 16 to extract most significative tune info */
+    play_channel_b(most_tune_duration_channel_b % 16, least_signif_tune_channel_b);
+  }
+
+  if (channel_a_tune_idx > channel_a_size) {
+    channel_a_tune_idx = 0;
+    channel_a_counter = most_tune_duration_channel_a[channel_a_tune_idx] / 16;
+  }
+
+  if (channel_b_tune_idx > channel_b_size) {
+    channel_b_tune_idx = 0;
+    channel_b_counter = most_tune_duration_channel_a[channel_b_tune_idx] / 16;
+  }
+
+}
+```
+
+#### Comparing Approaches
+
+| option                             | pros                                     | cons                                     |
+| :--------------------------------- | :--------------------------------------- | :--------------------------------------- |
+| Optimal Tune Range + Duration      | * Simpler coding (best for beginners)    | * Limited octave use (from O4 to O8)     |
+| All Tunes + Duration in 2 Bytes    | * Allow all tune octaves to be explored  | * Code complexity and less performance   |
+
+
+
+
+
+
+
+
+
+
+
+
