@@ -171,7 +171,7 @@ PSG should be programmed the following way, in order to produce white noise:
 
 **PS:** It is perfectly possible to enable tone and noise at the same time for a channel. Effectively noise can controlled as a 4th channel and several games use the white noise as a cymbal or drum effect in the game soundtrack.
 
-## Effectively Composing Soundtracks for Game
+# Effectively Composing Soundtracks for Game
 
 The size of background music depends on how elaborate the sound track is. 
 Typically, for a decent  soundtrack, 2 channels are used to build it.
@@ -183,7 +183,7 @@ In average, a soundtrack contains something about 128 notes (8 notes * 16 bars),
 
 However 512 bytes is a considerable size considering a multi-level game what opens opportunities to reduce soundtrack memory size. 
 
-### Reducing Memory Space with Optimal Tune Range
+## Reducing Memory Space with Optimal Tune Range
 
 1 byte per music note can be used instead of 2 bytes if a specific music frequency range is carefully chosen for the melody and bass channels.  
 
@@ -229,7 +229,7 @@ The BASIC program below demonstrate this concept more clearly with a real exampl
 170 SOUND 8,0: SOUND 9,0 'turn off vol
 ```
 
-### Add Duration to Music Tone
+## Add Duration to Music Tune
 
 With a naive approach, each music note can be stored with frequency (2 bytes) and duration (1 byte), therefore occupying 3 bytes. 
 However 3 bytes per music tone is too much space for the limited memory of MSX !
@@ -242,7 +242,7 @@ However 3 bytes per music tone is too much space for the limited memory of MSX !
 | 0            | 8F (G)        | 100           | 1            | 1D (G)        | 200           |
 
 
-#### Option 1 - Use Optimal Tune Range with Duration
+### Option 1 - Use Optimal Tune Range with Duration
 
 With optimal note range explained in previous section, the table becomes smaller.
 
@@ -303,18 +303,18 @@ while game_loop {
 
   if (channel_a_tune_idx > channel_a_size) {
     channel_a_tune_idx = 0;
-    channel_a_counter = most_tune_duration_channel_a[channel_a_tune_idx] / 16;
+    channel_a_counter = duration_channel_a[channel_a_tune_idx];
   }
 
   if (channel_b_tune_idx > channel_b_size) {
     channel_b_tune_idx = 0;
-    channel_b_counter = most_tune_duration_channel_a[channel_b_tune_idx] / 16;
+    channel_b_counter = duration_channel_b[channel_b_tune_idx];
   }
 
 }
 ```
 
-#### Option 2 - Use 1 Byte to Store Both Duration and Most Significative Tune 
+### Option 2 - Use 1 Byte to Store Both Duration and Most Significative Tune 
 
 The PSG registers responsible for the most signiticative tune, make use of only 4 bits, therefore leaving other 4 bits available for other uses such as duration.
 
@@ -394,7 +394,7 @@ while game_loop {
 }
 ```
 
-#### Comparing Approaches
+### Comparing Approaches
 
 | option                             | pros                                     | cons                                     |
 | :--------------------------------- | :--------------------------------------- | :--------------------------------------- |
@@ -402,8 +402,20 @@ while game_loop {
 | All Tunes + Duration in 2 Bytes    | * Allow all tune octaves to be explored  | * Code complexity and less performance   |
 
 
+# Conclusions
 
-
+* About PSG programming
+  * Playing tunes and producing noise involves understanding how PSG registers work
+  * Musical notes can be translated to tune frequency with PSG available channels with registers 0-5
+  * White noise can also be programmed with respective frequency with register 6
+  * PSG can be programmed to produce tune, noise or both depending on the mixer setting values with register 7
+  * Different volume levels can be set to channels via registers 8-10
+  * Different envelope sounds can be set for tunes or noise with registers 11-13
+* Game music tune
+  * Music storage should be planned ahead to avoid soundtrack from taking too much memory from MSX1
+  * Music notes can be expressed with 1 byte depending on the octave ranges being used
+  * Music note durations and most significative frequency value can be both encoded in 1 byte
+  * When choosing approach to play soundtrack, consider both pros and cons of both approaches
 
 
 

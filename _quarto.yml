@@ -16,7 +16,7 @@ website:
 
 format:
   html:
-    theme: superhero
+    theme: darkly
     css: styles.css
 
 comments:
