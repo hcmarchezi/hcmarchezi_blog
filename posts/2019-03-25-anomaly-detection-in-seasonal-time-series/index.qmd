@@ -1,0 +1,366 @@
+---
+title: "Anomaly Detection in Seasonal Time Series"
+author: "Humberto C Marchezi"
+date: "2019-03-25"
+categories: [machine-learning, timeseries, anomaly-detection]
+execute: 
+  enabled: true
+---
+
+# Context
+
+Anomalies are data points that are very different from the vast majority of the other data
+that is being analysed. Anomaly detection is the class of algorithms responsible for detecting the anomalies based on some programmed criteria.
+
+![Anomalies](fig_0_0_anomaly.png)
+
+Anomaly detection is used in different problem domains such as:
+
+* Financial Fraud 
+* Manufacturing Inspection 
+* Network Intrusion Detection 
+* Web Service Disaster Discovery 
+
+But other problem domains as well.
+
+
+```{python}
+#| echo: false
+import pandas as pd
+from matplotlib import pyplot as plt
+plt.style.use('dark_background')
+signal_df = pd.read_csv('./signal.csv', parse_dates=['timestamp'], index_col='timestamp')
+random_df = pd.read_csv('./random.csv', index_col='line_number')
+```
+
+## DevOps Use Case
+
+One common use is in the DevOps activities.
+
+![DevOps](fig_0_1_devops.png)
+
+In DevOps activities, machines are monitored through graphic analysis of CPU levels, memory consumption, several metrics levels, etc.
+
+![DevOps Monitors](fig_0_2_devops_monitors.png)
+
+However relying on human eyes to look at dashboards is not a scalable option when there are almost a hundred of metrics.
+
+**Therefore, some type of automation is needed!**
+
+
+An automated metric alarm system could be built as shown below:
+
+
+```{mermaid}
+flowchart LR
+  m[Metric Collector]
+  i[Incident Detection System]
+  a[Alarm Generator]
+  e[DevOps Engineer]
+  m --> |metric data points| i --> |incidents| a --> |notifications| e 
+```
+
+Depending on the anomaly detection use case, this activity could be less or more complicated.
+
+### Use Case 1 - Linear Distribution
+
+Let's suppose there is a metric that counts how many times a machine is rebooting.
+
+```{python}
+#| echo: false
+#| label: plot-reboots-per-machine
+#| fig-cap: Number of reboots per machine
+plt.figure(num=None, figsize=(14, 6), dpi=80, facecolor='w', edgecolor='k')
+plt.scatter(random_df.index, random_df['value'])
+
+# Add labels and title
+plt.xlabel('Timestamp')
+plt.ylabel('Reboots')
+plt.title('Number of reboots per machine')
+
+# Show the plot
+plt.show()
+```
+
+In this case, machines that reboot too much are anomalies of interest. 
+
+How to isolate them? 
+
+For that, a simple approach is to use a linear threshold to isolate anomalies.
+
+```{python}
+#| echo: false
+#| label: plot-reboots-with-threshold-and-anomalies
+#| fig-cap: Number of reboots per machine
+from datetime import datetime 
+plt.figure(num=None, figsize=(14, 6), dpi=80, facecolor='w', edgecolor='k')
+plt.scatter(random_df.index, random_df['value'])
+plt.axhline(y=29, color='r', linestyle='--', label='threshold')
+
+markers_df = random_df[random_df['value'].isin([42.0, 43.0])]
+plt.scatter(markers_df.index, markers_df['value'],
+            color='green',       # Marker color
+            marker='o',          # Marker shape (circle)
+            s=100,               # Marker size
+            label='anomalies',# Label for the legend
+            zorder=3)            # zorder=3 makes markers appear on top
+plt.show()
+```
+
+Based on median and mad as intervals could be enough to isolate anomalous machines with too many reboots after the upper limit.
+
+The upper limit of median + 2 * mad could be used as a threshold for this case.
+
+
+```{python}
+#| echo: false
+#| label: plot-seasonal-with-median-mad
+#| fig-cap: Number of reboots per machine with statistic threshold
+from datetime import datetime 
+import numpy as np
+plt.figure(num=None, figsize=(14, 6), dpi=80, facecolor='w', edgecolor='k')
+plt.scatter(random_df.index, random_df['value'])
+
+
+y_mean = np.mean(random_df['value'])
+y_upper_limit = np.mean(random_df['value']) + 2*np.std(random_df['value'])
+y_lower_limit = np.mean(random_df['value']) - 2*np.std(random_df['value'])
+
+
+plt.axhline(y=y_mean, color='r', linestyle='--', label='mean')
+plt.axhline(y=y_upper_limit, color='r', linestyle='--', label='2 * standard deviation')
+plt.axhline(y=y_lower_limit, color='r', linestyle='--', label='2 * standard deviation')
+
+markers_df = random_df[random_df['value'].isin([54.0, 66.0, 77.0])]
+plt.scatter(markers_df.index, markers_df['value'],
+            color='green',       # Marker color
+            marker='o',          # Marker shape (circle)
+            s=100,               # Marker size
+            label='anomalies',# Label for the legend
+            zorder=3)            # zorder=3 makes markers appear on top
+plt.show()
+```
+
+That was quite straight-forward, let's see another case .
+
+
+### Use Case 2 - Seasonal Distributions
+
+When monitoring the number of requests being made to a service during a couple days, 
+typically a signal with the following pattern would be found.
+
+```{python}
+#| echo: false
+#| label: seasonal-signal
+#| fig-cap: Seasonal Signal
+plt.figure(num=None, figsize=(14, 6), dpi=80, facecolor='w', edgecolor='k')
+plt.plot(signal_df.index, signal_df['value'])
+
+# Add labels and title
+plt.xlabel('Timestamp')
+plt.ylabel('Reboots')
+plt.title('Number of reboots per machine')
+
+# Show the plot
+plt.show()
+```
+
+When trying to apply a linear-based threshold, it might be possible to detect global anomalies since they are very different from the others.
+
+```{python}
+#| echo: false
+#| label: seasonal-signal-with-threshold-and-anomalies
+#| fig-cap: Seasonal Signal with Threshold
+from datetime import datetime 
+plt.figure(num=None, figsize=(14, 6), dpi=80, facecolor='w', edgecolor='k')
+plt.plot(signal_df.index, signal_df['value'])
+plt.axhline(y=29, color='r', linestyle='--', label='threshold')
+
+markers_df = signal_df[signal_df['value'].isin([42.0, 43.0])]
+plt.scatter(markers_df.index, markers_df['value'],
+            color='green',       # Marker color
+            marker='o',          # Marker shape (circle)
+            s=100,               # Marker size
+            label='anomalies',# Label for the legend
+            zorder=3)            # zorder=3 makes markers appear on top
+plt.show()
+```
+
+
+On the other hand, there are anomalies that happen inside the range of the signal but are
+ still not expected for the given moment in the timeseries. 
+
+How to proceed to detect those local anomalies ?
+
+
+```{python}
+#| echo: false
+#| label: seasonal-signal-with-local-anomalies
+#| fig-cap: Seasonal Signal and Local Anomalies
+from datetime import datetime 
+plt.figure(num=None, figsize=(14, 6), dpi=80, facecolor='w', edgecolor='k')
+plt.plot(signal_df.index, signal_df['value'])
+plt.axhline(y=29, color='r', linestyle='--', label='threshold')
+
+markers_df = signal_df[signal_df['value'].isin([42.0, 43.0])]
+plt.scatter(markers_df.index, markers_df['value'],
+            color='green',       # Marker color
+            marker='o',          # Marker shape (circle)
+            s=100,               # Marker size
+            label='global anomalies',# Label for the legend
+            zorder=3)            # zorder=3 makes markers appear on top
+
+
+markers_df = signal_df[signal_df['value'].isin([17.0, 15.0])]
+plt.scatter(markers_df.index, markers_df['value'],
+            color='red',       # Marker color
+            marker='o',          # Marker shape (circle)
+            s=100,               # Marker size
+            label='local anomalies',# Label for the legend
+            zorder=3)            # zorder=3 makes markers appear on top
+
+
+plt.show()
+```
+
+That is the scope of this article.
+
+# Seasonal-Trend Decomposition
+
+In order to capture those anomalies, it is necessary to review the signal characteristics such as seasonality, frequency and presence of long-term trend.
+
+Seasonality could be daily, frequency is how often the datapoints are provided such as 1 per hour and the trend is expressed as a long-term inclination of the graph.
+
+![Frequency Analysis](fig_7_seasonal_signal_and_freq_analysis.png)
+
+Frequency here is 24 hrs.
+
+Besides that it is also important to understand if the signal variation increases with trend or if it remains the same.
+
+
+## Additive vs Multiplicative Time Series
+
+Timeseries properties change can follow an additive or multiplicative behavior.
+
+Consider the examples below:
+
+![Additive and Multiplicative Timeseries](fig_8_seasonal_signal_examples.png)
+
+the timeseries above can be decomposed into the following timeseries:
+
+* **trend** - long term signal behavior
+* **seasonal** - identified repetitive behavior
+* **residual** - all the rest that doesn’t fit the trend or seasonal 
+
+### Multiplicative Model
+
+Seasonal Trend Decomposition
+
+| observed                    | = | trend                   | * | seasonal                       | * | residuals                     |
+|-----------------------------|---|-------------------------|---|--------------------------------|---|-------------------------------|
+| ![](fig_9_1_1_observed.png) |   | ![](fig_9_1_2_trend.png)|   | ![](fig_9_1_3_seasonality.png) |   | ![](fig_9_1_4_residual.png)   |
+
+
+### Additive Model
+
+| observed                    | = | trend                   | + | seasonal                       | + | residuals                     |
+|-----------------------------|---|-------------------------|---|--------------------------------|---|-------------------------------|
+| ![](fig_9_2_1_observed.png) |   | ![](fig_9_2_2_trend.png)|   | ![](fig_9_2_3_seasonality.png) |   | ![](fig_9_2_4_residual.png)   |
+
+
+## Coming back to Use Case 2
+
+Given all thatm how to capture the local anomalies in that type of seasonal timeseries ?
+
+```{python}
+#| echo: false
+#| label: seasonal-signal-problem
+#| fig-cap: Seasonal Signal and Local Anomalies
+from datetime import datetime 
+plt.figure(num=None, figsize=(14, 6), dpi=80, facecolor='w', edgecolor='k')
+plt.plot(signal_df.index, signal_df['value'])
+plt.axhline(y=29, color='r', linestyle='--', label='threshold')
+
+markers_df = signal_df[signal_df['value'].isin([42.0, 43.0])]
+plt.scatter(markers_df.index, markers_df['value'],
+            color='green',       # Marker color
+            marker='o',          # Marker shape (circle)
+            s=100,               # Marker size
+            label='global anomalies',# Label for the legend
+            zorder=3)            # zorder=3 makes markers appear on top
+
+
+markers_df = signal_df[signal_df['value'].isin([17.0, 15.0])]
+plt.scatter(markers_df.index, markers_df['value'],
+            color='red',       # Marker color
+            marker='o',          # Marker shape (circle)
+            s=100,               # Marker size
+            label='local anomalies',# Label for the legend
+            zorder=3)            # zorder=3 makes markers appear on top
+
+
+plt.show()
+```
+
+The $frequency = 24$, 24 datapoints per day, 1 datapoint per hour.
+
+The behaviour seems to be additive.
+
+## Signal Decomposition
+
+Signal must be decomposed so each part can be analysed separately.
+
+![](fig_11_1_signal_decomposition.png)
+
+Specifically, the residual which is free from the trend and seasonality information becomes the component of interest in anonmaly detection.
+
+![](fig_11_2_signal_decomposition.png)
+
+
+After that by comparing the original signal with the residual, it becomes apparent where the anomalies are even those inside the typical signal range.
+
+![](fig_12_extract_residual_from_signal.png)
+
+Global and local anomalies are mapped in the residual component.
+
+![](fig_13_residual_with_linear_threshold.png)
+
+Considering only, the extracted residual signal.
+
+![](fig_14_residual_signal.png)
+
+It is possible now to apply statistical threshold on it.
+
+![](fig_15_residual_signal_with_statistic_threshold.png)
+
+With the threshold, it is now possible to identify anomalies.
+
+![](fig_16_local_and_global_anomalies.png)
+
+Mapping the anomalies found in residual back to the original signal identifies all data points of interest, it can be
+observed how the identified datapoints match the anomalies.
+
+![](fig_17_local_and_global_anomalies_original_signal)
+
+
+Pros:
+
+* Works well with seasonal time series - global and local anomalies [cite: 25]
+* Few parameters to optimize (compared to other models) [cite: 25]
+* Algorithm implementation is simple given statistics libraries as available [cite: 25]
+
+Cons:
+
+* Need to know how to adjust period parameter for each time series [cite: 25]
+* Need to know how to adjust anomaly factor so to avoid noisy results [cite: 25]
+* Works only for seasonal time series where residual is a normal distribution [cite: 25]
+
+# References / Q&A
+
+* Notebook Demo - https://github.com/hcmarchezi/jupyter_notebooks/blob/master/residual_extraction_demo_1.ipynb
+* Twitter Anomaly Detection - https://github.com/twitter/AnomalyDetection
+* Automatic Anomaly Detection in the Cloud Via Statistical Learning - https://arxiv.org/pdf/1704.07706.pdf
+* Generalized ESD for Outliers - https://www.itl.nist.gov/div898/handbook/eda/section3/eda35h3.htm
+* Real Time Anomaly Detection System for Time Series at Scale - http://proceedings.mlr.press/v71/toledano18a/toledano18a.pdf
+* Time Series Dataset - https://datamarket.com/data/
+
