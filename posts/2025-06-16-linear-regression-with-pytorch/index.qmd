@@ -1,0 +1,346 @@
+---
+title: "Linear Regression with PyTorch"
+author: "Humberto C Marchezi"
+date: "2025-06-16"
+categories: [machine-learning]
+description: Explains essential concepts to build a linear regression with PyTorch with a simple example
+execute:
+  echo: false
+---
+
+## Building a Linear Regression Model with PyTorch
+
+Linear regression is a statistical model used to predict a value (regression analysis) that assumes a linear relationship between all the regressors (X) and the dependent variable (Y). 
+
+When trying to calculate one dependent variable, this is mathematically expressed with the formula below:
+
+
+For every regressor $x$ from $0$ to $n$:
+
+$$
+y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_n x_n 
+$$
+
+For multivariate linear regression, when multiple outcome variables are produced, this formula becomes:
+
+
+For every dependent variable $i$ and all regressors from $0$ to $n$:
+
+$$
+y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + ... + \beta_n x_{in}
+$$
+
+
+During training, the objective is to calculate the coefficients represented as $\beta_i$ that can best calculate outcome variables with minimal errors. Errors are typically calculated by a mean squared error (MSE) function while the parameters (coefficients) can be optimised via stochastic gradient descent (SGD).
+
+The next sections explain some basic steps to build such linear regression model with PyTorch.
+
+### Creating the Linear Regression Model
+
+Although, PyTorch library was designed for complex neural networks, it is possible to build a simple linear model.
+
+The model can be represented as a module with 1-layer plugged into a linear layer.
+
+```python
+import torch.nn as nn
+
+class LinearRegression(nn.Module):
+    def __init__(self, input_dim: int, output_dim: int):
+        super(LinearRegression, self).__init__()
+        self.linear = nn.Linear(
+            in_features=input_dim,
+            out_features=output_dim)
+
+    def forward(self, x):
+        return self.linear(x)
+```
+
+
+
+### Training Process
+
+Training a machine learning model involve aspects such as a separated cross-validation dataset for 
+hyperparameter fine tunning, k-fold techniques, etc.
+
+Due to reasons of scope and to keep this article small and focused on PyTorch aspects for Linear Regression, a minimal approach is goind to be used.
+
+With this in mind, training process is described by the following steps:
+
+* get data sample
+* split data into training and testing
+* normalize features
+
+#### Get Data Sample from Housing Price Dataset
+
+The Housing Price Dataset from Kaggle was chosen since it is public, simple and well formatted.
+
+See details here: https://www.kaggle.com/datasets/yasserh/housing-prices-dataset
+
+From the provided csv file, the following columns were selected:
+
+| **column** | description                              |
+| :--------- | :--------------------------------------- |
+| price      | price of a house                         |
+| area       | area of a house                          |
+| bathrooms  | number of bathrooms in a house           |
+| bedrooms   | number of house bedrooms                 |
+| stories    | number of house stories                  |
+
+
+The idea is to use the linear regression model to predict the **price** given the remaining features:
+area, bathrooms, bedrooms and stories.
+
+#### Split CSV Data Into Training and Testing
+
+A small utility function was built to read csv file and split into training and test as PyTorch tensors.
+
+This functions receives as input a csv path, list of input features (cols) and a list of label features.
+
+```python
+import os
+import torch
+import pandas as pd
+
+def split_csv_into_x_and_y(
+        csv_path: str,
+        input_cols: List[str],
+        label_cols: List[str]
+) -> tuple[torch.tensor, torch.tensor]:
+    csv_file_path = os.path.dirname(os.path.realpath(__file__)) + '/' + csv_path
+    df = pd.read_csv(csv_file_path).dropna()
+    x_data_df = df[input_cols]
+    y_data_df = df[label_cols]
+    x_data = torch.tensor(x_data_df.values, dtype=torch.float32)
+    y_data = torch.tensor(y_data_df.values, dtype=torch.float32)
+    return x_data, y_data
+```
+
+#### Feature Normalization
+
+Normalization is the process of transforming the numeric range so that the average is 0 and standard deviation is 
+1. This way the numeric distribution across different features follow the same statistical properties.
+
+
+* **mean:** $\mu = \frac{\sum_{i=0}^n x_i}{n}$  
+
+* **standard deviation:** $\sigma = \frac{\sum_{i=0}^n x_i - \mu}{n}$ 
+
+* **normalization for a feature x:** $\hat{x_i} = \frac{x_i - \mu}{\sigma}$
+
+
+Initially I forgot that step and I though the linear regression model could compensate that with the right parameters
+such as a small enough learning rate. However it is not necessarily true, normalization is key so that the machine 
+learning model can proper converge to a solution.
+
+For that, the utility python functions were developed:
+
+* **calculate mean and std from a feature**
+
+```python
+def calculate_mean_std(data: torch.tensor) -> tuple[torch.tensor, torch.tensor]:
+    return data.mean(dim=0, keepdim=True), data.std(dim=0, keepdim=True)
+
+```
+
+* **normalizing feature data**
+
+```python
+def normalize_data(
+        data: torch.tensor, data_mean: torch.float32, data_std: torch.float32, 
+        epsilon: torch.float32 = 1e-8) -> torch.tensor:
+    return (data - data_mean) / (data_std + epsilon)
+```
+
+Without normalization, the training may not converge and error rates can actually 
+explode during training.
+
+In some cases, actual results can be obtained with unnecessary computational cost
+from the learning algorithm to compensate for the different feature numerical
+distributions.
+
+### Instantiate Linear Regression Model with Loss Function and Optimiser
+
+In order setup a model in PyTorch for learning, a loss function and optimiser 
+needs to be chosen according to the problem to be solved. 
+
+The **loss function** specifies how errors will be penalized while the **optimiser**
+is the algorithm that seeks to minimise the error calculated by the loss function.
+
+For each problem, such as **regression**, **classification**, **multi-classification**, etc, 
+a different combination of loss function and optimiser is recommended.
+
+For linear regression:
+
+* **loss function:** mean squared errors (MSE) 
+* **optimiser:** stochastic gradient descent (SGD)
+
+```python
+model = LinearRegression(input_dim=4, output_dim=1)
+loss_criteria = nn.MSELoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+```
+
+### Training Loop Code
+
+After model is instantiated with proper loss and optmiser setup, it is time 
+to code the training loop.
+
+In this particular example, training loop continues until one of the criteria is met:
+
+* training loss stops to reduce
+* training loss starts to diverge (error rate increase)
+
+
+```python
+# Training the Model
+num_epochs = 500
+loss_history = []
+loss_prev = torch.finfo(torch.float32).max
+loss_stop_criteria = 150000
+
+for epoch in range(num_epochs):
+    model.train()
+    y_predicted = model(x_data)
+
+    loss = loss_criteria(y_predicted, y_data)
+    loss_diff = loss_prev - loss
+    loss_prev = loss
+    loss_history.append(loss)
+
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+    print(f"epoch={epoch} loss={loss} loss_diff={loss_diff}")
+    if loss_diff < loss_stop_criteria or loss > loss_prev:
+        print("stop training !!")
+        break
+```
+
+## Conclusion
+
+Solving linear regression problem with PyTorch involves:
+
+* creating a model with 1 linear layer with *nn.Linear*
+* getting, splitting and normalising a training/test database
+* choosing the correct loss function and optimiser
+* coding a training loop with appropriate stop criteria
+
+Entire code can be found here:
+
+```python
+import os
+from typing import List
+
+import torch
+import torch.nn as nn
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+# Linear Regression Model
+class LinearRegression(nn.Module):
+    def __init__(self, input_dim: int, output_dim: int):
+        super(LinearRegression, self).__init__()
+        self.linear = nn.Linear(
+            in_features=input_dim,
+            out_features=output_dim)
+
+    def forward(self, x):
+        return self.linear(x)
+
+
+def calculate_mean_std(data: torch.tensor) -> tuple[torch.tensor, torch.tensor]:
+    return data.mean(dim=0, keepdim=True), data.std(dim=0, keepdim=True)
+
+
+def normalize_data(data: torch.tensor, data_mean: torch.float32, data_std: torch.float32, epsilon: torch.float32 = 1e-8) -> torch.tensor:
+    return (data - data_mean) / (data_std + epsilon)
+
+
+def split_csv_into_x_and_y(
+        csv_path: str,
+        input_cols: List[str],
+        label_cols: List[str]
+) -> tuple[torch.tensor, torch.tensor]:
+    csv_file_path = os.path.dirname(os.path.realpath(__file__)) + '/' + csv_path
+    df = pd.read_csv(csv_file_path).dropna()
+    x_data_df = df[input_cols]
+    y_data_df = df[label_cols]
+    x_data = torch.tensor(x_data_df.values, dtype=torch.float32)
+    y_data = torch.tensor(y_data_df.values, dtype=torch.float32)
+    return x_data, y_data
+
+
+
+# Read housing price data as csv
+x_data, y_data = split_csv_into_x_and_y(
+    csv_path='housing_prices_dataset.csv',
+    input_cols=['area', 'bathrooms', 'bedrooms', 'stories'],
+    label_cols=['price']
+)
+
+
+x_mean, x_std = calculate_mean_std(x_data)
+x_data = normalize_data(x_data, data_mean=x_mean, data_std=x_std)
+
+
+# Instantiate Model, Loss Function, and Optimizer
+model = LinearRegression(input_dim=4, output_dim=1)
+loss_criteria = nn.MSELoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+
+
+# Training the Model
+num_epochs = 500
+loss_history = []
+loss_prev = torch.finfo(torch.float32).max
+loss_stop_criteria = 150000
+
+for epoch in range(num_epochs):
+    model.train()
+    y_predicted = model(x_data)
+
+    loss = loss_criteria(y_predicted, y_data)
+    loss_diff = loss_prev - loss
+    loss_prev = loss
+    loss_history.append(loss)
+
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+    print(f"epoch={epoch} loss={loss} loss_diff={loss_diff}")
+    if loss_diff < loss_stop_criteria or loss > loss_prev:
+        print("stop training !!")
+        break
+
+
+# Plot train loss history
+loss_history = [float(loss_item) for loss_item in loss_history]
+plt.plot(loss_history)
+plt.ylabel('loss')
+plt.show()
+
+
+# Make a prediction for new data
+model.eval()
+#         'area', 'bathrooms', 'bedrooms', 'stories'
+new_x = [[  6000,          1,          2,         1],
+         [  7000,          2,          2,         2],
+         [  6500,          1,          2,         2],
+         [  5000,          1,          1,         1]]
+new_x = normalize_data(torch.tensor(new_x), data_mean=x_mean, data_std=x_std)
+with torch.no_grad():
+    predictions_for_new_x = model(new_x)
+
+print("Prediction results for new data points:")
+for i, x_val in enumerate(new_x):
+    x_display = x_val.numpy()
+    print(f"X: [{x_display}] -> Predicted Y: {predictions_for_new_x[i].item():.2f}")
+```
+
+
+
+
+
+
+

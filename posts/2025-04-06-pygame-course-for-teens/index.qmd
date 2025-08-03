@@ -1,0 +1,1538 @@
+---
+title: "Pygame Course for Teens"
+author: "Humberto C Marchezi"
+date: "2025-04-06"
+categories: [programming, kids, games]
+description: Describes how to efficiently play game sound track with MSX1
+execute:
+  echo: false
+---
+
+## Pygame Space Invaders Course 
+
+Sometime ago, in the 90s, I started mh interest in programming because I wanted to draw graphics on 
+the TV screen and also understanding how to make little games to work.
+
+I would never learn if computer programming was presented to me as something related to process numbers.
+
+I had a lot fun learning how to draw a background, design the sprites (the moving images like ships), the sound
+effects and sometime music track. Specially how to tie all of these elements together in a game that 
+would be fun to play.
+
+Therefore I decided to design some little exercises step by step on how to build a simple but classic game.
+Kind of space invaders, not really. 
+
+
+### Setup Your Pygame and Drawing the Background
+
+**Key Tasks:**
+
+-   Installing Pygame
+-   Create pyton file for game
+-   Initialize Pygame
+-   Create a display window
+-   Fill window with background color
+-   Include event loop for the game
+-   Process user input inside loop
+-   Update display
+
+**Exercise 1: Creating a Blue Space**
+
+1.  **Install Pygame:** If you haven't already, open your terminal or command prompt and run:
+    
+    Bash
+    
+    ```
+    pip install pygame
+    
+    ```
+    
+2.  **Create a new Python file** (e.g., `space_invaders.py`).
+    
+3.  **Write the following code:**
+    
+    
+    ```python
+    import pygame
+    
+    # Initialize Pygame
+    pygame.init()
+    
+    # Screen dimensions
+    screen_width = 800
+    screen_height = 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    pygame.display.set_caption("My First Space")
+    
+    # Colors (RGB values)
+    blue = (0, 0, 255)
+    
+    # Game loop
+    running = True
+    while running:
+        # Event handling
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+    
+        # Drawing the background
+        screen.fill(blue)
+    
+        # Update the display
+        pygame.display.flip()
+    
+    # Quit Pygame
+    pygame.quit()
+    
+    ```
+    
+4.  **Run the code:** Open your terminal or command prompt, navigate to the directory where you saved the file, and run:
+    
+    Bash
+    
+    ```
+    python space_invaders.py
+    
+    ```
+    
+    You should see a blue window appear as a background. Close the window to end the program.
+    
+
+### Section 2: Displaying the Player Ship as a Sprite
+
+In games, moving objects like our spaceship are often represented as **sprites**. 
+A sprite is essentially an image that can be moved and manipulated on the screen. 
+
+Back in my days when programming for an MSX computer, a sprite could be 8x8 or 16x16 pixels.
+That is incredibly small for the standards of today, with Pygame, we can do much better.
+Instead of pixel by pixel programming, we can load an image the represents the sprite we would like to move.
+
+For that, Pygame has a powerful `Sprite` class that helps us manage these game objects whith which we can:
+
+-   Load an image such as PNG for our spaceship, for instance
+-   Create a Sprite class that inherits from `pygame.sprite.Sprite` to hold sprite image and position
+-   Draw the sprite image (our spaceship) at a specific location on the screen.
+
+Here are the topics we need to learn:
+
+-   **Sprites:** Moving game objects with images.
+-   **`pygame.sprite.Sprite`:** The base class for creating game sprites.
+-   **`self.image`:** The attribute of a sprite that holds its visual representation (a Pygame `Surface`).
+-   **`self.rect`:** The attribute of a sprite that holds its rectangular area (position and size). We use this to control the sprite's position.
+-   **`pygame.image.load()`:** Function to load image files.
+-   **`screen.blit()`:** Function to draw one surface onto another (in this case, our ship onto the game screen).
+
+**Exercise 2: Bringing in the Spaceship**
+
+1.  **Find a spaceship image:** Search online for a simple spaceship image (e.g., a PNG with a transparent background). Save it in the same directory as your `space_invaders.py` file (e.g., `player_ship.png`).
+
+There many ways to get a sprite image for a spaceship. Searching online is one option by using google images however if you want to make it really fun, consider to use on0-line sprite editors such as `piskelapp.com`, `pixilart.com` or any other you prefer. Try out some of them, see which one you can get confortable with.
+
+
+At this points, the game project directory should look like this:
+
+```
+/my_example_game
+    space_invaders.py
+    player_ship.png
+```
+
+Next to to understand how to complete python code to display that sprite.
+
+    
+2.  **Modify your `space_invaders.py` code:**
+    
+    
+    ```python
+    import pygame
+    
+    # Initialize Pygame
+    pygame.init()
+    
+    # Screen dimensions
+    screen_width = 800
+    screen_height = 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    pygame.display.set_caption("My First Space")
+    
+    # Colors
+    blue = (0, 0, 255)
+    
+    # Player ship class
+    class Player(pygame.sprite.Sprite):
+        def __init__(self):
+            super().__init__()
+            self.image = pygame.image.load("player_ship.png").convert_alpha() # Load image with transparency
+            self.rect = self.image.get_rect()
+            self.rect.centerx = screen_width // 2
+            self.rect.bottom = screen_height - 20
+    
+        def update(self):
+            # We'll add movement logic here later
+            pass
+    
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+    
+    # Create player object
+    player = Player()
+    
+    # Game loop
+    running = True
+    while running:
+        # Event handling
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+    
+        # Drawing
+        screen.fill(blue)
+        player.draw(screen) # Draw the player ship
+    
+        # Update the display
+        pygame.display.flip()
+    
+    # Quit Pygame
+    pygame.quit()
+    
+    ```
+    
+3.  **Run the code:** You should now see your spaceship image at the bottom center of the blue screen.
+
+Note that the spaceship is displayed but it is static at the center of the screen.
+
+Next section we are going to understand how to move it with keyboard input.
+
+### Section 3: Controlling the Player Ship with Keyboard Input
+
+To make our game interactive, we need to allow the player to control the spaceship. We can achieve this by listening for keyboard events. Pygame's event system allows us to detect when a key is pressed or released.
+
+With this exercise, we will learn the following concepts:
+
+-   **Detect key presses:** Check which keys are being pressed down.
+-   **Move the sprite:** Update the player ship's `rect.x` (horizontal position) based on the pressed keys.
+-   **Implement boundary checking:** Prevent the ship from moving off the screen.
+
+This will be represented by the following in the code:
+
+-   **`pygame.key.get_pressed()`:** Returns a sequence of boolean values indicating the state of each key.
+-   **`pygame.K_LEFT`, `pygame.K_RIGHT`:** Pygame constants representing the left and right arrow keys.
+-   **Updating `rect.x`:** Changing the horizontal position of the sprite.
+-   **Boundary Conditions:** Setting limits to keep the sprite within the screen boundaries.
+
+**Exercise 3: Moving the Spaceship**
+
+1.  **Modify your `Player` class in `space_invaders.py`:**
+    
+    
+    ```python
+    import pygame
+    
+    # Initialize Pygame
+    pygame.init()
+    
+    # Screen dimensions
+    screen_width = 800
+    screen_height = 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    pygame.display.set_caption("My First Space")
+    
+    # Colors
+    blue = (0, 0, 255)
+    white = (255, 255, 255)
+    
+    # Player ship class
+    class Player(pygame.sprite.Sprite):
+        def __init__(self):
+            super().__init__()
+            self.image = pygame.image.load("player_ship.png").convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.centerx = screen_width // 2
+            self.rect.bottom = screen_height - 20
+            self.speed = 5 # Pixels per frame
+    
+        def update(self):
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                self.rect.x -= self.speed
+            if keys[pygame.K_RIGHT]:
+                self.rect.x += self.speed
+    
+            # Keep player within screen boundaries
+            if self.rect.left < 0:
+                self.rect.left = 0
+            if self.rect.right > screen_width:
+                self.rect.right = screen_width
+    
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+    
+    # Create player object
+    player = Player()
+    
+    # Game loop
+    running = True
+    while running:
+        # Event handling
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+    
+        # Update
+        player.update()
+    
+        # Drawing
+        screen.fill(blue)
+        player.draw(screen)
+    
+        # Update the display
+        pygame.display.flip()
+    
+    # Quit Pygame
+    pygame.quit()
+    
+    ```
+    
+2.  **Run the code:** Now you should be able to control the spaceship's horizontal movement using the left and right arrow keys. It should also stop at the edges of the screen.
+    
+
+### Section 4: Displaying the Enemy Ships
+
+Our Space Invaders game needs enemies! We'll represent these as sprites as well. We'll create a class for the enemy ships and arrange them in a grid formation at the top of the screen.
+
+To achieve that, we need the following:
+
+-   **Create an Enemy Sprite class:** Similar to the `Player` class, but for the enemies.
+-   **Load an enemy image.**
+-   **Position multiple enemies:** Use loops to create and position a group of enemy sprites.
+-   **Use `pygame.sprite.Group`:** A Pygame container to manage multiple sprite objects efficiently.
+
+Code will be updated with:
+
+-   **Enemy Sprite Class:** Defining the behavior and appearance of individual enemies.
+-   **`pygame.sprite.Group()`:** A container to hold and manage multiple `Sprite` objects. It provides methods for updating and drawing all sprites in the group.
+-   **Nested Loops:** Useful for creating grid-like structures.
+
+**Exercise 4: Invading Enemies**
+
+1.  **Find an enemy ship image:** Find another simple spaceship image for the enemy (e.g., `enemy_ship.png`) and save it in your project directory.
+    
+2.  **Modify your `space_invaders.py` code:**
+    
+    
+    ```python
+    import pygame
+    
+    # Initialize Pygame
+    pygame.init()
+    
+    # Screen dimensions
+    screen_width = 800
+    screen_height = 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    pygame.display.set_caption("My First Space")
+    
+    # Colors
+    blue = (0, 0, 255)
+    white = (255, 255, 255)
+    
+    # Player ship class (no changes needed from Exercise 3)
+    class Player(pygame.sprite.Sprite):
+        def __init__(self):
+            super().__init__()
+            self.image = pygame.image.load("player_ship.png").convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.centerx = screen_width // 2
+            self.rect.bottom = screen_height - 20
+            self.speed = 5
+    
+        def update(self):
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                self.rect.x -= self.speed
+            if keys[pygame.K_RIGHT]:
+                self.rect.x += self.speed
+            if self.rect.left < 0:
+                self.rect.left = 0
+            if self.rect.right > screen_width:
+                self.rect.right = screen_width
+    
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+    
+    # Enemy ship class
+    class Enemy(pygame.sprite.Sprite):
+        def __init__(self, x, y):
+            super().__init__()
+            self.image = pygame.image.load("enemy_ship.png").convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.x = x
+            self.rect.y = y
+    
+        def update(self):
+            # We'll add enemy movement later
+            pass
+    
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+    
+    # Create enemy group
+    enemies = pygame.sprite.Group()
+    enemy_rows = 4
+    enemy_cols = 8
+    enemy_spacing_x = 60
+    enemy_spacing_y = 50
+    start_x = 50
+    start_y = 50
+    
+    for row in range(enemy_rows):
+        for col in range(enemy_cols):
+            enemy = Enemy(start_x + col * enemy_spacing_x, start_y + row * enemy_spacing_y)
+            enemies.add(enemy)
+    
+    # Create player object
+    player = Player()
+    
+    # Game loop
+    running = True
+    while running:
+        # Event handling
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+    
+        # Update
+        player.update()
+        enemies.update() # Update all enemies in the group
+    
+        # Drawing
+        screen.fill(blue)
+        player.draw(screen)
+        enemies.draw(screen) # Draw all enemies in the group
+    
+        # Update the display
+        pygame.display.flip()
+    
+    # Quit Pygame
+    pygame.quit()
+    
+    ```
+    
+3.  **Run the code:** You should now see a grid of enemy ships at the top of the screen along with your player ship.
+    
+
+### Section 5: Making the Player Ship Fire a Missile
+
+To fight back against the invaders, our player needs to be able to fire missiles. We'll create a `Missile` sprite that the player can launch by pressing a key (like the spacebar).
+
+Concepts to learn:
+
+-   **Create a Missile Sprite class:** Define the missile's appearance and movement.
+-   **Detect key presses for firing:** Listen for a specific key press.
+-   **Create and add missile sprites:** When the fire key is pressed, create a new `Missile` object and add it to a group of active missiles.
+-   **Move the missiles upwards.**
+-   **Remove off-screen missiles:** Clean up missiles that have gone beyond the top of the screen to save resources.
+
+Modifications in code:
+
+-   **Missile Sprite Class:** Defining the missile's image, starting position, and upward movement.
+-   **Firing Mechanism:** Triggering the creation of a missile based on user input.
+-   **Missile Group:** Managing multiple active missiles.
+-   **Removing Sprites:** Deleting sprites from a group when they are no longer needed.
+
+**Exercise 5: Fire in the Hole!**
+
+1.  **Create a simple image for your missile** (e.g., a small white rectangle named `missile.png`) and save it in your project directory.
+    
+2.  **Modify your `space_invaders.py` code:**
+    
+    ```python
+    import pygame
+    
+    # Initialize Pygame
+    pygame.init()
+    
+    # Screen dimensions
+    screen_width = 800
+    screen_height = 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    pygame.display.set_caption("My First Space")
+    
+    # Colors
+    blue = (0, 0, 255)
+    white = (255, 255, 255)
+    
+    # Player ship class (no changes needed from Exercise 3)
+    class Player(pygame.sprite.Sprite):
+        def __init__(self):
+            super().__init__()
+            self.image = pygame.image.load("player_ship.png").convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.centerx = screen_width // 2
+            self.rect.bottom = screen_height - 20
+            self.speed = 5
+    
+        def update(self):
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                self.rect.x -= self.speed
+            if keys[pygame.K_RIGHT]:
+                self.rect.x += self.speed
+            if self.rect.left < 0:
+                self.rect.left = 0
+            if self.rect.right > screen_width:
+                self.rect.right = screen_width
+    
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+    
+    # Missile class
+    class Missile(pygame.sprite.Sprite):
+        def __init__(self, x, y):
+            super().__init__()
+            self.image = pygame.image.load("missile.png").
+    
+    ```
+
+Alright, let's continue building our Space Invaders game, with clear comments to highlight the new code in each section!
+
+### Section 6: Collision Detection Between Missile and Enemy Ships
+
+Now for the exciting part – making our missiles actually destroy the enemy ships! This involves detecting when a missile sprite overlaps with an enemy sprite. Pygame provides functions to easily check for these **collisions**.
+
+Concepts to learn:
+
+* **Use `pygame.sprite.groupcollide()`:** This function checks for collisions between all sprites in one group and all sprites in another group.
+* **Handle collisions:** Determine what happens when a collision occurs (e.g., remove both the missile and the enemy).
+
+Updates in code:
+
+* **Collision Detection:** The process of determining when two game objects overlap.
+* **`pygame.sprite.groupcollide(group1, group2, dokill1, dokill2)`:** This function returns a dictionary of sprites in `group1` that collide with sprites in `group2`. The `dokill` arguments (True/False) specify whether to automatically remove the colliding sprites from their respective groups.
+
+**Exercise 6: Missile Impact!**
+
+1.  **Modify your `space_invaders.py` code:**
+
+    ```python
+    import pygame
+
+    # Initialize Pygame
+    pygame.init()
+
+    # Screen dimensions
+    screen_width = 800
+    screen_height = 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    pygame.display.set_caption("My First Space")
+
+    # Colors
+    blue = (0, 0, 255)
+    white = (255, 255, 255)
+
+    # Player ship class (no changes needed from Exercise 5)
+    class Player(pygame.sprite.Sprite):
+        def __init__(self):
+            super().__init__()
+            self.image = pygame.image.load("player_ship.png").convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.centerx = screen_width // 2
+            self.rect.bottom = screen_height - 20
+            self.speed = 5
+
+        def update(self):
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                self.rect.x -= self.speed
+            if keys[pygame.K_RIGHT]:
+                self.rect.x += self.speed
+            if self.rect.left < 0:
+                self.rect.left = 0
+            if self.rect.right > screen_width:
+                self.rect.right = screen_width
+
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+
+    # Missile class (no changes needed from Exercise 5)
+    class Missile(pygame.sprite.Sprite):
+        def __init__(self, x, y):
+            super().__init__()
+            self.image = pygame.image.load("missile.png").convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.centerx = x
+            self.rect.bottom = y
+            self.speed_y = -10
+
+        def update(self):
+            self.rect.y += self.speed_y
+            if self.rect.bottom < 0:
+                self.kill() # Remove the missile if it goes off-screen
+
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+
+    # Enemy ship class (no changes needed from Exercise 4)
+    class Enemy(pygame.sprite.Sprite):
+        def __init__(self, x, y):
+            super().__init__()
+            self.image = pygame.image.load("enemy_ship.png").convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.x = x
+            self.rect.y = y
+
+        def update(self):
+            # We'll add enemy movement later
+            pass
+
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+
+    # Create player object
+    player = Player()
+
+    # Create enemy group
+    enemies = pygame.sprite.Group()
+    enemy_rows = 4
+    enemy_cols = 8
+    enemy_spacing_x = 60
+    enemy_spacing_y = 50
+    start_x = 50
+    start_y = 50
+
+    for row in range(enemy_rows):
+        for col in range(enemy_cols):
+            enemy = Enemy(start_x + col * enemy_spacing_x, start_y + row * enemy_spacing_y)
+            enemies.add(enemy)
+
+    # Create missile group
+    missiles = pygame.sprite.Group()
+
+    # Game loop
+    running = True
+    while running:
+        # Event handling
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            # --- NEW CODE BLOCK START ---
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    new_missile = Missile(player.rect.centerx, player.rect.top)
+                    missiles.add(new_missile)
+            # --- NEW CODE BLOCK END ---
+
+        # Update
+        player.update()
+        enemies.update()
+        missiles.update()
+
+        # --- NEW CODE BLOCK START ---
+        # Check for collisions between missiles and enemies
+        collisions = pygame.sprite.groupcollide(missiles, enemies, True, True)
+        # The 'True, True' arguments mean both the missile and the enemy will be removed upon collision.
+        # --- NEW CODE BLOCK END ---
+
+        # Drawing
+        screen.fill(blue)
+        player.draw(screen)
+        enemies.draw(screen)
+        missiles.draw(screen)
+
+        # Update the display
+        pygame.display.flip()
+
+    # Quit Pygame
+    pygame.quit()
+    ```
+
+2.  **Run the code:** Now, when you press the spacebar, your ship will fire missiles. If a missile hits an enemy ship, both the missile and the enemy ship should disappear!
+
+### Section 7: Programming Collision Detection Between Enemy Ships and the Player Ship
+
+We need to make the game challenging! If the enemy ships reach the player, it should result in a game over. We'll use collision detection again, this time between the enemy group and the player sprite.
+
+Concepts to learn:
+
+* **Use `pygame.sprite.spritecollide()`:** This function checks for collisions between a single sprite and all sprites in a group.
+* **Implement game over logic:** Define what happens when the player collides with an enemy (e.g., set a `game_over` flag).
+* **Display a game over message.**
+
+Updates in code:
+
+* **`pygame.sprite.spritecollide(sprite, group, dokill)`:** Checks for collisions between a single sprite and a group of sprites. The `dokill` argument determines if the colliding sprites in the group should be removed.
+* **Game State:** Using variables (like `game_over`) to track different phases of the game.
+* **Font Rendering:** Displaying text on the screen using Pygame's font module.
+
+**Exercise 7: Danger Close!**
+
+1.  **Modify your `space_invaders.py` code:**
+
+    ```python
+    import pygame
+
+    # Initialize Pygame
+    pygame.init()
+
+    # Screen dimensions
+    screen_width = 800
+    screen_height = 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    pygame.display.set_caption("My First Space")
+
+    # Colors
+    blue = (0, 0, 255)
+    white = (255, 255, 255)
+    red = (255, 0, 0)
+
+    # Player ship class (no changes needed from Exercise 6)
+    class Player(pygame.sprite.Sprite):
+        def __init__(self):
+            super().__init__()
+            self.image = pygame.image.load("player_ship.png").convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.centerx = screen_width // 2
+            self.rect.bottom = screen_height - 20
+            self.speed = 5
+
+        def update(self):
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                self.rect.x -= self.speed
+            if keys[pygame.K_RIGHT]:
+                self.rect.x += self.speed
+            if self.rect.left < 0:
+                self.rect.left = 0
+            if self.rect.right > screen_width:
+                self.rect.right = screen_width
+
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+
+    # Missile class (no changes needed from Exercise 6)
+    class Missile(pygame.sprite.Sprite):
+        def __init__(self, x, y):
+            super().__init__()
+            self.image = pygame.image.load("missile.png").convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.centerx = x
+            self.rect.bottom = y
+            self.speed_y = -10
+
+        def update(self):
+            self.rect.y += self.speed_y
+            if self.rect.bottom < 0:
+                self.kill()
+
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+
+    # Enemy ship class (no changes needed from Exercise 6)
+    class Enemy(pygame.sprite.Sprite):
+        def __init__(self, x, y):
+            super().__init__()
+            self.image = pygame.image.load("enemy_ship.png").convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.x = x
+            self.rect.y = y
+
+        def update(self):
+            # We'll add enemy movement later
+            pass
+
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+
+    # Create player object
+    player = Player()
+
+    # Create enemy group
+    enemies = pygame.sprite.Group()
+    enemy_rows = 4
+    enemy_cols = 8
+    enemy_spacing_x = 60
+    enemy_spacing_y = 50
+    start_x = 50
+    start_y = 50
+
+    for row in range(enemy_rows):
+        for col in range(enemy_cols):
+            enemy = Enemy(start_x + col * enemy_spacing_x, start_y + row * enemy_spacing_y)
+            enemies.add(enemy)
+
+    # Create missile group
+    missiles = pygame.sprite.Group()
+
+    # Initialize game over flag
+    game_over = False
+    # --- NEW CODE BLOCK START ---
+    # Font for displaying game over message
+    font = pygame.font.Font(None, 74)
+    # --- NEW CODE BLOCK END ---
+
+    # Game loop
+    running = True
+    while running:
+        # Event handling
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if not game_over: # Only allow firing if the game is not over
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        new_missile = Missile(player.rect.centerx, player.rect.top)
+                        missiles.add(new_missile)
+
+        if not game_over:
+            # Update
+            player.update()
+            enemies.update()
+            missiles.update()
+
+            # Check for collisions between missiles and enemies
+            pygame.sprite.groupcollide(missiles, enemies, True, True)
+
+            # --- NEW CODE BLOCK START ---
+            # Check for collision between player and enemies
+            if pygame.sprite.spritecollide(player, enemies, False):
+                game_over = True
+            # --- NEW CODE BLOCK END ---
+
+            # Drawing
+            screen.fill(blue)
+            player.draw(screen)
+            enemies.draw(screen)
+            missiles.draw(screen)
+        else:
+            # --- NEW CODE BLOCK START ---
+            # Display game over message
+            game_over_text = font.render("Game Over", True, red)
+            text_rect = game_over_text.get_rect(center=(screen_width // 2, screen_height // 2))
+            screen.blit(game_over_text, text_rect)
+            # --- NEW CODE BLOCK END ---
+
+        # Update the display
+        pygame.display.flip()
+
+    # Quit Pygame
+    pygame.quit()
+    ```
+
+2.  **Run the code:** Now, if an enemy ship touches your player ship, the game will freeze, and a "Game Over" message will appear in the center of the screen.
+
+### Section 8: Including Sound Effects
+
+Sound effects can significantly enhance the gaming experience. Without sound effects, game is just silent animation on the screen.
+
+Pygame's `mixer` module allows us to load and play sound files.
+
+Concepts to learn:
+
+* **Initialize the Pygame mixer:** Set up the audio system.
+* **Load sound files:** Load sound files (like `.wav` or `.ogg`) into Pygame `Sound` objects.
+* **Play sound effects:** Trigger the playback of sounds at specific events (e.g., when firing a missile or when a collision occurs).
+
+Updates in code:
+
+* **`pygame.mixer.init()`:** Initializes the audio mixer module.
+* **`pygame.mixer.Sound("filename")`:** Loads a sound file.
+* **`sound.play()`:** Plays the loaded sound.
+
+**Exercise 8: Adding Audio Ambiance**
+
+1.  **Find some simple sound effect files:** Look for sound effects like a laser shot and an explosion (in `.wav` or `.ogg` format). Save them in your project directory (e.g., `laser.wav`, `explosion.wav`).
+
+
+project directory:
+
+```
+/my_game_project
+    space_invaders.py
+    player_ship.png
+    missile.png
+    laser.wav
+    explosion.wav
+```
+
+
+2.  **Modify your `space_invaders.py` code:**
+
+    ```python
+    import pygame
+
+    # Initialize Pygame
+    pygame.init()
+    # --- NEW CODE BLOCK START ---
+    # Initialize the mixer for sound
+    pygame.mixer.init()
+    # --- NEW CODE BLOCK END ---
+
+    # Screen dimensions
+    screen_width = 800
+    screen_height = 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    pygame.display.set_caption("My First Space")
+
+    # Colors
+    blue = (0, 0, 255)
+    white = (255, 255, 255)
+    red = (255, 0, 0)
+
+    # Player ship class
+    class Player(pygame.sprite.Sprite):
+        def __init__(self):
+            super().__init__()
+            self.image = pygame.image.load("player_ship.png").convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.centerx = screen_width // 2
+            self.rect.bottom = screen_height - 20
+            self.speed = 5
+
+        def update(self):
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                self.rect.x -= self.speed
+            if keys[pygame.K_RIGHT]:
+                self.rect.x += self.speed
+            if self.rect.left < 0:
+                self.rect.left = 0
+            if self.rect.right > screen_width:
+                self.rect.right = screen_width
+
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+
+    # Missile class
+    class Missile(pygame.sprite.Sprite):
+        def __init__(self, x, y):
+            super().__init__()
+            self.image = pygame.image.load("missile.png").convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.centerx = x
+            self.rect.bottom = y
+            self.speed_y = -10
+
+        def update(self):
+            self.rect.y += self.speed_y
+            if self.rect.bottom < 0:
+                self.kill()
+
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+
+    # Enemy ship class
+    class Enemy(pygame.sprite.Sprite):
+        def __init__(self, x, y):
+            super().__init__()
+            self.image = pygame.image.load("enemy_ship.png").convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.x = x
+            self.rect.y = y
+
+        def update(self):
+            # We'll add enemy movement later
+            pass
+
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+
+    # Create player object
+    player = Player()
+
+    # Create enemy group
+    enemies = pygame.sprite.Group()
+    enemy_rows = 4
+    enemy_cols = 8
+    enemy_spacing_x = 60
+    enemy_spacing_y = 50
+
+    ```python
+    start_x = 50
+    start_y = 50
+
+    for row in range(enemy_rows):
+        for col in range(enemy_cols):
+            enemy = Enemy(start_x + col * enemy_spacing_x, start_y + row * enemy_spacing_y)
+            enemies.add(enemy)
+
+    # Create missile group
+    missiles = pygame.sprite.Group()
+
+    # Initialize game over flag
+    game_over = False
+    font = pygame.font.Font(None, 74)
+
+    # --- NEW CODE BLOCK START ---
+    # Load sound effects
+    laser_sound = pygame.mixer.Sound("laser.wav")
+    explosion_sound = pygame.mixer.Sound("explosion.wav")
+    # --- NEW CODE BLOCK END ---
+
+    # Game loop
+    running = True
+    while running:
+        # Event handling
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if not game_over:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        new_missile = Missile(player.rect.centerx, player.rect.top)
+                        missiles.add(new_missile)
+                        # Play laser sound when firing
+                        laser_sound.play() # --- NEW CODE BLOCK ---
+
+        if not game_over:
+            # Update
+            player.update()
+            enemies.update()
+            missiles.update()
+
+            # Check for collisions between missiles and enemies
+            collisions = pygame.sprite.groupcollide(missiles, enemies, True, True)
+            # Play explosion sound for each enemy hit
+            for hit in collisions: # --- NEW CODE BLOCK ---
+                explosion_sound.play() # --- NEW CODE BLOCK ---
+
+            # Check for collision between player and enemies
+            if pygame.sprite.spritecollide(player, enemies, False):
+                game_over = True
+
+        else:
+            # Display game over message
+            game_over_text = font.render("Game Over", True, red)
+            text_rect = game_over_text.get_rect(center=(screen_width // 2, screen_height // 2))
+            screen.blit(game_over_text, text_rect)
+
+        # Drawing
+        screen.fill(blue)
+        player.draw(screen)
+        enemies.draw(screen)
+        missiles.draw(screen)
+
+        # Update the display
+        pygame.display.flip()
+
+    # Quit Pygame
+    pygame.quit()
+    ```
+
+3.  **Make sure you have `laser.wav` and `explosion.wav`** in the same directory as your Python script. Run the game, and you should now hear sound effects when you fire and when a missile hits an enemy!
+
+### Section 9: Including a Background Sound Track
+
+A background music track can create a more immersive atmosphere for your game. Pygame's `mixer.music` module is specifically designed for playing longer music files.
+
+concepts to learn:
+
+* **Load a music file:** Load a music file (like `.mp3` or `.ogg`) using `pygame.mixer.music.load()`.
+* **Play the music:** Start playing the background music using `pygame.mixer.music.play()`.
+* **Loop the music:** Make the music repeat continuously.
+
+code updates:
+
+* **`pygame.mixer.music.load("filename")`:** Loads a music file for background music.
+* **`pygame.mixer.music.play(-1)`:** Starts playing the loaded music. The `-1` argument makes the music loop indefinitely.
+* **`pygame.mixer.music.stop()`:** Stops the background music.
+
+**Exercise 9: Setting the Mood**
+
+1.  **Find a background music file** (in `.mp3` or `.ogg` format) and save it in your project directory (e.g., `background_music.mp3`).
+
+project directory:
+
+```
+/my_game_project
+    space_invaders.py
+    player_ship.png
+    missile.png
+    laser.wav
+    explosion.wav
+    background_music.mp3
+```
+
+
+2.  **Modify your `space_invaders.py` code:**
+
+    ```python
+    import pygame
+
+    # Initialize Pygame
+    pygame.init()
+    pygame.mixer.init()
+
+    # Screen dimensions
+    screen_width = 800
+    screen_height = 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    pygame.display.set_caption("My First Space")
+
+    # Colors
+    blue = (0, 0, 255)
+    white = (255, 255, 255)
+    red = (255, 0, 0)
+
+    # Player ship class (no changes needed from Exercise 8)
+    class Player(pygame.sprite.Sprite):
+        def __init__(self):
+            super().__init__()
+            self.image = pygame.image.load("player_ship.png").convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.centerx = screen_width // 2
+            self.rect.bottom = screen_height - 20
+            self.speed = 5
+
+        def update(self):
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                self.rect.x -= self.speed
+            if keys[pygame.K_RIGHT]:
+                self.rect.x += self.speed
+            if self.rect.left < 0:
+                self.rect.left = 0
+            if self.rect.right > screen_width:
+                self.rect.right = screen_width
+
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+
+    # Missile class (no changes needed from Exercise 8)
+    class Missile(pygame.sprite.Sprite):
+        def __init__(self, x, y):
+            super().__init__()
+            self.image = pygame.image.load("missile.png").convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.centerx = x
+            self.rect.bottom = y
+            self.speed_y = -10
+
+        def update(self):
+            self.rect.y += self.speed_y
+            if self.rect.bottom < 0:
+                self.kill()
+
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+
+    # Enemy ship class (no changes needed from Exercise 8)
+    class Enemy(pygame.sprite.Sprite):
+        def __init__(self, x, y):
+            super().__init__()
+            self.image = pygame.image.load("enemy_ship.png").convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.x = x
+            self.rect.y = y
+
+        def update(self):
+            # We'll add enemy movement later
+            pass
+
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+
+    # Create player object
+    player = Player()
+
+    # Create enemy group
+    enemies = pygame.sprite.Group()
+    enemy_rows = 4
+    enemy_cols = 8
+    enemy_spacing_x = 60
+    enemy_spacing_y = 50
+    start_x = 50
+    start_y = 50
+
+    for row in range(enemy_rows):
+        for col in range(enemy_cols):
+            enemy = Enemy(start_x + col * enemy_spacing_x, start_y + row * enemy_spacing_y)
+            enemies.add(enemy)
+
+    # Create missile group
+    missiles = pygame.sprite.Group()
+
+    # Initialize game over flag
+    game_over = False
+    font = pygame.font.Font(None, 74)
+    laser_sound = pygame.mixer.Sound("laser.wav")
+    explosion_sound = pygame.mixer.Sound("explosion.wav")
+
+    # --- NEW CODE BLOCK START ---
+    # Load and play background music
+    pygame.mixer.music.load("background_music.mp3")
+    pygame.mixer.music.play(-1) # Loop indefinitely
+    # --- NEW CODE BLOCK END ---
+
+    # Game loop
+    running = True
+    while running:
+        # Event handling
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if not game_over:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        new_missile = Missile(player.rect.centerx, player.rect.top)
+                        missiles.add(new_missile)
+                        laser_sound.play()
+
+        if not game_over:
+            # Update
+            player.update()
+            enemies.update()
+            missiles.update()
+
+            # Check for collisions between missiles and enemies
+            collisions = pygame.sprite.groupcollide(missiles, enemies, True, True)
+            for hit in collisions:
+                explosion_sound.play()
+
+            # Check for collision between player and enemies
+            if pygame.sprite.spritecollide(player, enemies, False):
+                game_over = True
+
+        else:
+            # Display game over message
+            game_over_text = font.render("Game Over", True, red)
+            text_rect = game_over_text.get_rect(center=(screen_width // 2, screen_height // 2))
+            screen.blit(game_over_text, text_rect)
+
+        # Drawing
+        screen.fill(blue)
+        player.draw(screen)
+        enemies.draw(screen)
+        missiles.draw(screen)
+
+        # Update the display
+        pygame.display.flip()
+
+    # Quit Pygame
+    pygame.quit()
+    ```
+
+3.  **Ensure you have `background_music.mp3`** (or your chosen music file) in your project directory. Run the game, and you should now have background music playing!
+
+### Section 10: Keeping Track of the Player Score
+
+A score adds a competitive element to the game. We need to keep track of how many enemies the player has destroyed and display it on the screen.
+
+concepts to learn:
+
+* **Initialize a score variable.**
+* **Increment the score:** Increase the score whenever a missile hits an enemy.
+* **Display the score:** Render the score as text on the screen.
+
+code updates:
+
+* **Score Variable:** A variable to store the player's current score.
+* **Incrementing:** Increasing the value of a variable.
+* **Font Rendering (again):** Using Pygame's font module to display text (this time for the score).
+
+**Exercise 10: Score Counter Activated!**
+
+1.  **Modify your `space_invaders.py` code:**
+
+    ```python
+    import pygame
+
+    # Initialize Pygame
+    pygame.init()
+    pygame.mixer.init()
+
+    # Screen dimensions
+    screen_width = 800
+    screen_height = 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    pygame.display.set_caption("My First Space")
+
+    # Colors
+    blue = (0, 0, 255)
+    white = (255, 255, 255)
+    red = (255, 0, 0)
+    green = (0, 255, 0) # For the score text
+
+    # Player ship class (no changes needed from Exercise 9)
+    class Player(pygame.sprite.Sprite):
+        def __init__(self):
+            super().__init__()
+            self.image = pygame.image.load("player_ship.png").convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.centerx = screen_width // 2
+            self.rect.bottom = screen_height - 20
+            self.speed = 5
+
+        def update(self):
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                self.rect.x -= self.speed
+            if keys[pygame.K_RIGHT]:
+                self.rect.x += self.speed
+            if self.rect.left < 0:
+                self.rect.left = 0
+            if self.rect.right > screen_width:
+                self.rect.right = screen_width
+
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+
+    # Missile class (no changes needed from Exercise 9)
+    class Missile(pygame.sprite.Sprite):
+        def __init__(self, x, y):
+            super().__init__()
+            self.image = pygame.image.load("missile.png").convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.centerx = x
+            self.rect.bottom = y
+            self.speed_y = -10
+
+        def update(self):
+            self.rect.y += self.speed_y
+            if self.rect.bottom < 0:
+                self.kill()
+
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+
+    # Enemy ship class (no changes needed from Exercise 9)
+    class Enemy(pygame.sprite.Sprite):
+        def __init__(self, x, y):
+            super().__init__()
+            self.image = pygame.image.load("enemy_ship.png").convert_alpha()
+            self.rect = self.image.get_rect()
+            self.rect.x = x
+            self.rect.y = y
+
+        def update(self):
+            # We'll add enemy movement later
+            pass
+
+        def draw(self, surface):
+            surface.blit(self.image, self.rect)
+
+    # Create player object
+    player = Player()
+
+    # Create enemy group
+    enemies = pygame.sprite.Group()
+    enemy_rows = 4
+    enemy_cols = 8
+    enemy_spacing_x = 60
+    enemy_spacing_y = 50
+    start_x = 50
+    start_y = 50
+
+    for row in range(enemy_rows):
+        for col in range(enemy_cols):
+            enemy = Enemy(start_x + col * enemy_spacing_x, start_y + row * enemy_spacing_y)
+            enemies.add(enemy)
+
+    # Create missile group
+    missiles = pygame.sprite.Group()
+
+    # Initialize game over flag
+    game_over = False
+    game_over_font = pygame.font.Font(None, 74)
+    laser_sound = pygame.mixer.Sound("laser.wav")
+    explosion_sound = pygame.mixer.Sound("explosion.wav")
+    pygame.mixer.music.load("background_music.mp3")
+    pygame.mixer.music.play(-1)
+
+    # --- NEW CODE BLOCK START ---
+    # Initialize score
+    score = 0
+    score_font = pygame.font.Font(None, 36)
+    # --- NEW CODE BLOCK END ---
+
+    # Game loop
+    running = True
+    while running:
+        # Event handling
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if not game_over:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        new_missile = Missile(player.rect.centerx, player.rect.top)
+                        missiles.add(new_missile)
+                        laser_sound.play()
+
+        if not game_over:
+            # Update
+            player.update()
+            enemies.update()
+            missiles.update()
+
+            # Check for collisions between missiles and enemies
+            collisions = pygame.sprite.groupcollide(missiles, enemies, True, True)
+            for hit in collisions:
+                explosion_sound.play()
+                # Increment the score for each enemy hit
+                score += 1 # --- NEW CODE BLOCK ---
+
+            # Check for collision between player and enemies
+            if pygame.sprite.spritecollide(player, enemies, False):
+                game_over = True
+
+        else:
+            # Display game over message
+            game_over_text = game_over_font.render("Game Over", True, red)
+            text_rect = game_over_text.get_rect(center=(screen_width // 2, screen_height // 2))
+            screen.blit(game_over_text, text_rect)
+
+        # Drawing
+        screen.fill(blue)
+        player.draw(screen)
+        enemies.draw(screen)
+        missiles.draw(screen)
+
+        # --- NEW CODE BLOCK START ---
+        # Display the score
+        score_text = score_font.render(f"Score: {score}", True, green)
+        screen.blit(score_text, (10, 10)) # Top-left corner
+        # --- NEW CODE BLOCK END ---
+
+        # Update the display
+        pygame.display.flip()
+
+    # Quit Pygame
+    pygame.quit()
+    ```
+
+2.  **Run the code:** You should now see a score displayed in the top-left corner of the screen. The score will increase each time you successfully hit and destroy an enemy ship.
+
+Congratulations! You've now completed all the core elements of a basic Space Invaders game. By working through these sections and completing the exercises, you've learned fundamental Pygame concepts and built a functional game.
+
+**Final Game**
+
+```python
+import pygame
+
+# Initialize Pygame
+pygame.init()
+pygame.mixer.init()
+
+# Screen dimensions
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Space Invaders")
+
+# Colors
+BLUE = (0, 0, 255)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+
+# Player ship class
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load("player_ship.png").convert_alpha()
+        self.rect = self.image.get_rect(centerx=SCREEN_WIDTH // 2, bottom=SCREEN_HEIGHT - 20)
+        self.speed = 5
+
+    def update(self):
+        keys = pygame.key.get_pressed()
+        self.rect.x += (keys[pygame.K_RIGHT] - keys[pygame.K_LEFT]) * self.speed
+        self.rect.clamp_ip(SCREEN.get_rect())
+
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
+
+# Missile class
+class Missile(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.image.load("missile.png").convert_alpha()
+        self.rect = self.image.get_rect(centerx=x, bottom=y)
+        self.speed_y = -10
+
+    def update(self):
+        self.rect.y += self.speed_y
+        if self.rect.bottom < 0:
+            self.kill()
+
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
+
+# Enemy ship class
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.image.load("enemy_ship.png").convert_alpha()
+        self.rect = self.image.get_rect(topleft=(x, y))
+
+    def update(self):
+        pass # Enemy movement will be added later
+
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
+
+# Game setup
+player = Player()
+enemies = pygame.sprite.Group()
+missiles = pygame.sprite.Group()
+game_over = False
+score = 0
+font_large = pygame.font.Font(None, 74)
+font_medium = pygame.font.Font(None, 36)
+laser_sound = pygame.mixer.Sound("laser.wav")
+explosion_sound = pygame.mixer.Sound("explosion.wav")
+pygame.mixer.music.load("background_music.mp3")
+pygame.mixer.music.play(-1)
+
+# Create enemies
+ENEMY_ROWS = 4
+ENEMY_COLS = 8
+ENEMY_SPACING_X = 60
+ENEMY_SPACING_Y = 50
+START_X = 50
+START_Y = 50
+for row in range(ENEMY_ROWS):
+    for col in range(ENEMY_COLS):
+        enemy = Enemy(START_X + col * ENEMY_SPACING_X, START_Y + row * ENEMY_SPACING_Y)
+        enemies.add(enemy)
+
+# Game loop
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        if not game_over and event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            missile = Missile(player.rect.centerx, player.rect.top)
+            missiles.add(missile)
+            laser_sound.play()
+
+    if not game_over:
+        player.update()
+        enemies.update()
+        missiles.update()
+
+        collisions = pygame.sprite.groupcollide(missiles, enemies, True, True)
+        for _ in collisions:
+            explosion_sound.play()
+            score += 1
+
+        if pygame.sprite.spritecollide(player, enemies, False):
+            game_over = True
+
+    SCREEN.fill(BLUE)
+    player.draw(SCREEN)
+    enemies.draw(SCREEN)
+    missiles.draw(SCREEN)
+
+    score_text = font_medium.render(f"Score: {score}", True, GREEN)
+    SCREEN.blit(score_text, (10, 10))
+
+    if game_over:
+        game_over_text = font_large.render("Game Over", True, RED)
+        text_rect = game_over_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+        SCREEN.blit(game_over_text, text_rect)
+
+    pygame.display.flip()
+
+pygame.quit()
+```
