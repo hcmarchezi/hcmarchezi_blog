@@ -1,0 +1,259 @@
+---
+title: "Minimal RAG Development with Hugging Face"
+author: "Humberto C Marchezi"
+date: "2025-11-24"
+categories: [machine-learning]
+description: Steps to implement semantic search with RAG using Hugging Face
+execute:
+  echo: false
+---
+
+## Sementic Search with Minimal RAG using Hugging Face
+
+
+This article is a continuation of the post [Minimal Rag with Ollama](../2025-11-23-minimal-rag-with-ollama/index.qmd) 
+but this time, a RAG system will be developed via hugging face python libraries.
+
+
+As a quick recap (see post above for details), this RAG system will be composed by 2 parts:
+
+### Part 1 - Prepare Vector Database for the Facts
+
+```{mermaid}
+flowchart LR
+  facts_file[(my_facts.txt)] --> |text facts| convert_to_embedding_vectors[convert to embedding vectors]
+  convert_to_embedding_vectors --> |facts embeddings| vector_database[(vectors database)] 
+```
+
+
+### Part 2 - Worflow to Process RAG Query
+
+```{mermaid}
+flowchart LR
+   vector_database[(vectors database)] --> |facts embeddings| get_top_most_similar[get top most similar]
+   get_top_most_similar --> |query augmented with facts| llm_model([large language model])
+   llm_model --> get_answer[get answer]
+   read_input_query[read input query] --> convert_query_to_embedding_vector[convert query to embedding vector] 
+   convert_query_to_embedding_vector --> |query embedding| get_top_most_similar
+```
+
+
+### Developing RAG with Hugging Face
+
+**Hugging Face** is central place for AI models since it is where developers can find models, datasets and documentation about several machine learning models.
+
+Besides that, Hugging Face also provide python libraries to support RAG implementation. 
+For the example below the libraries `transformers` and `sentence_transformers` were used.
+
+
+* **Converting Sentences to Sentence Embeddings**
+
+With Hugging Face, text sentenced are encoded via a Sentence Transformer that needs to be instantiated before the encoding process begins.
+
+
+```python
+from sentence_transformers import SentenceTransformer
+
+
+def convert_facts_to_embeddings_vector(chunks: List[str], embedding_model: SentenceTransformer) -> List:
+    vector_db = []
+    for i, chunk in enumerate(chunks):
+        embeddings = embedding_model.encode(chunk, max_length=50)
+        vector_db.append((chunk, embeddings))
+        print(f'Added chunk {i + 1}/{len(chunks)} to the database')
+    return vector_db
+```
+
+
+How it is used:
+
+```python
+embedding_model = SentenceTransformer("google/embeddinggemma-300m")
+chunks = ["Vivamus, Moriendum Est", "Condemnant quo non intellegunt", "Audentes fortuna iuvat"]
+vector_db = convert_facts_to_embeddings_vector(chunks, embedding_model)
+```
+
+
+
+* **Retrieving Facts More Closely Related to the Query**
+
+
+Cosine similarity is a vector distance function (same code used for the ollama example above).
+
+Retrieve function also follows the same idea present above. Get the top K most similar facts from a provided query sentence.
+
+
+```python
+def cosine_similarity(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+
+def retrieve_top_similar(query: str, vector_db: List, embedding_model: SentenceTransformer, top_n: int=3):
+    query_embedding = embedding_model.encode(query, max_length=50)
+    similarities = []
+    for chunk, embedding in vector_db:
+        similarity = cosine_similarity(query_embedding, embedding)
+        similarities.append((chunk, similarity))
+    similarities.sort(key=lambda x: x[1], reverse=True)
+    return similarities[:top_n]
+```
+
+
+* **Getting Answer from the Large Language Model**
+
+
+Hugging Face has the concept of pipeline from where the data is transformed accodingly before it can reach the chosen model as an input.
+
+In the code below the pipeline is represented by the variable `pipe`.
+
+Also a large language model should be chosen, this particular example `gemmma3` was chosen since it is compact model with 270 million parameters.
+
+**PS:** Typically large language models contain 1 billion or much more than that.
+
+
+```python
+from transformers import pipeline
+
+
+pipe = pipeline("text-generation", model="google/gemma-3-270m-it")
+outputs = pipe(
+    [
+        { "role": "system", "content": "You are a helpful chatbot specialized in story telling." },
+        { "role": "user",   "content": "Tell me a very short story of a boy that wanter to be a bear." }
+    ], 
+    max_new_tokens=1200
+)
+
+print('Chat response:')
+print(outputs[0]['generated_text'][-1]['content'])
+print()
+```
+
+
+
+### Complete Code Listing
+
+The final results combining the functions mentioned above in a python program can be seen below:
+
+
+```python
+import numpy as np
+from typing import List, Tuple
+from transformers import pipeline
+from sentence_transformers import SentenceTransformer
+
+
+
+def read_knowledge_facts(filename: str) -> List:
+    chunks = []
+    with open(filename, 'r') as file:
+      chunks = file.readlines()
+      print(f'Loaded {len(chunks)} entries')
+    return chunks
+
+
+def convert_facts_to_embeddings_vector(chunks: List[str], embedding_model: SentenceTransformer) -> List:
+    vector_db = []
+    for i, chunk in enumerate(chunks):
+        embeddings = embedding_model.encode(chunk, max_length=50)
+        vector_db.append((chunk, embeddings))
+        print(f'Added chunk {i + 1}/{len(chunks)} to the database')
+    return vector_db
+
+
+def cosine_similarity(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+
+def retrieve_top_similar(query: str, vector_db: List, embedding_model: SentenceTransformer, top_n: int=5):
+    query_embedding = embedding_model.encode(query, max_length=50)
+    similarities = []
+    for chunk, embedding in vector_db:
+        similarity = cosine_similarity(query_embedding, embedding)
+        similarities.append((chunk, similarity))
+    similarities.sort(key=lambda x: x[1], reverse=True)
+    return similarities[:top_n]
+
+
+def instruction_prompt(instruction: str, context: List[Tuple[str, str]]) -> str:
+    context_text = ''.join([' * ' + chunk for chunk, similarity in context])
+    return instruction + '\n\nUse only the following context below:\n' + context_text
+
+
+def main():
+    LANGUAGE_MODEL = "google/gemma-3-270m-it"
+    EMBEDDING_MODEL = "google/embeddinggemma-300m"
+
+
+    pipe = pipeline("text-generation", model=LANGUAGE_MODEL)
+    embedding_model = SentenceTransformer(EMBEDDING_MODEL)
+
+    print('Read knowledge base ...')
+    chunks = read_knowledge_facts('cat-facts.txt')
+
+    print('Convert knowledge base to embeddings vectors ...')
+    vector_db = convert_facts_to_embeddings_vector(chunks, embedding_model)
+
+    query = 'How many people are bitten by cats in the U.S. annually ?' #input('Ask a question:')
+    context = retrieve_top_similar(query, vector_db, embedding_model)
+
+    print('Prepare chat bot with instruction')
+    print('=================================')
+    print()
+    pre_instruction = 'You are a helpful chatbot specialized in cats.\n'
+    instruction = instruction_prompt(pre_instruction, context)
+
+    print('Instruction:')
+    print(instruction)
+    print()
+
+    print('Query:')
+    print(query)
+    print()
+
+    print('Answer:')
+    messages = [
+        {"role": "system", "content": instruction},
+        {"role": "user", "content": query},
+    ]
+    outputs = pipe(messages, max_new_tokens=1200)
+    print(outputs[0]['generated_text'][-1]['content'])
+    print()
+
+
+main()
+```
+
+
+Result:
+```
+Device set to use mps:0
+Read knowledge base ...
+Loaded 150 entries
+Convert knowledge base to embeddings vectors ...
+Added chunk 1/150 to the database
+Added chunk 2/150 to the database
+Added chunk 3/150 to the database
+...
+Added chunk 148/150 to the database
+Added chunk 149/150 to the database
+Added chunk 150/150 to the database
+Prepare chat bot with instruction
+=================================
+
+Instruction:
+You are a helpful chatbot specialized in cats.
+
+
+Use only the following context below:
+ * Approximately 40,000 people are bitten by cats in the U.S. annually.
+ * Mother cats teach their kittens to use the litter box.
+ * Though rare, cats can contract canine heart worms.
+
+
+Query:
+How many people are bitten by cats in the U.S. annually ?
+
+Answer:
+Approximately 40,000 people are bitten by cats in the U.S. annually.
+```
