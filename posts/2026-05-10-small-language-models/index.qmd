@@ -1,0 +1,347 @@
+---
+title: "What Are Small Language Models (SLMs)?"
+author: "Humberto C Marchezi"
+date: "2026-05-10"
+categories: [ai, machine-learning, nlp]
+description: An introduction to Small Language Models — what they are, why they matter, and how to run one on your laptop.
+execute:
+  echo: false
+---
+
+## What Are Small Language Models (SLMs)?
+
+When talking about AI to generate text, code, or images, almost everyone is
+actually talking about private models such as GPT, Claude, Grok or Gemini
+or other massive **Large Language Models (LLMs)** that cost millions to train and live in the cloud.
+
+But there is another option gaining popularity: language models
+small enough to run on a personal laptop, a phone, or even a Raspberry Pi.
+This post breaks down what **Small Language Models (SLMs)** actually are,
+why they matter, and walks through how to run one locally.
+
+
+### LLMs vs SLMs: it's all about parameters
+
+The key difference between LLMs and SLMs is in the parameter size.
+
+While LLMs have hundreds of billions of parameters that encode knowledge whose training costs tens of millions of dollars and demands racks of GPUs, an **SLM** is simply a language model with a dramatically smaller parameter count — typically under 10 billion parameters, sometimes as low as 100
+million.
+
+| Model                | Parameters    | Category |
+|----------------------|---------------|----------|
+| GPT-4                | ~1T (est.)    | LLM      |
+| DeepSeek-V4          | 862B          | LLM      |        
+| Llama 3 8B           | 8B            | SLM      |
+| Phi-3 Mini           | 3.8B          | SLM      |
+| Gemma 3              | 270M          | SLM      |
+|SmolLM2-135M-Instruct | 135M          | SLM      |
+
+Therefore the trade-off of using an SLM instead of an LLM is less general knowledge, but drastically lower cost and hardware requirements.
+
+### Why do SLMs exist? The case for small
+
+Essentially there are three reasons to prefer SLMs over private LLMs:
+
+  * **cost**
+  * **privacy**
+  * **latency**
+
+```{mermaid}
+flowchart TB
+   use_case[your use case] --> cost{cost?}
+   use_case --> privacy{privacy?}
+   use_case --> latency{latency / offline?}
+   cost --> |10K reqs/day| slm[SLM]
+   privacy --> |patient or financial data| slm
+   latency --> |edge device, no internet| slm
+```
+
+* **Cost.** A customer-support pipeline at 10,000 conversations a day adds
+  up fast at frontier-model API rates. A fine-tuned 3B model on your own
+  server has near-zero marginal cost per request.
+* **Privacy.** In healthcare, finance, or legal work you literally cannot
+  send sensitive data to a third-party API. A local SLM keeps the data on
+  your machine.
+* **Latency / edge.** Factory sensors, security cameras, and on-device
+  mobile apps need inference without a network round-trip — sometimes
+  without any network at all.
+
+Common use cases:
+
+* Document Q&A on private data (no cloud needed)
+* On-device AI for phones and IoT
+* High-volume, cost-sensitive pipelines
+* Fine-tuned specialists laser-focused on a single task
+
+### SLM strengths
+
+* **Efficiency and Speed**
+SLMs require significantly fewer computational resources, enabling faster inference times. This makes them ideal for real-time applications and deployment on edge devices, mobile phones, and resource-constrained environments. They can also run locally without relying on cloud infrastructure.
+
+* **Privacy and Data Security**
+SLMs can run locally on user devices, so sensitive data doesn't need to be transmitted to remote servers. This is particularly valuable for personal information, medical records, or confidential business data. Users maintain complete control over their data.
+
+* **Fine-tuning Flexibility**
+SLMs are cheaper to fine-tune for specific tasks and domains. Organizations can customize them for niche use cases, which makes them excellent for specialized applications like customer support, legal document analysis, or industry-specific knowledge tasks.
+
+### Hands-on: simple demo in five steps
+
+This section explains how to actually build a simple demo with an SLM using `Gemma 3 270M`
+to run on a personal laptop while also addressing important aspects such as:
+
+* load an SLM model
+* count the model parameters
+* estimate how much memory is taken by the chosen model
+* benchmark model inference speed with tokens per second
+* calculate context window limits
+
+These aspects are very important to compare different SLM models and make trade-offs on 
+memory space, model inference speed and context window limits in order to understand
+which model best supports a use case.
+
+
+#### 1. Run your first SLM with `transformers`
+
+A few lines of Python load Gemma 3 270M and ask it a question. No API key,
+no network call after the initial download.
+
+```python
+import time
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM
+
+# --- Instantiate model and tokenizer by ID ---
+model_id = "google/gemma-3-270m-it"
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+model = AutoModelForCausalLM.from_pretrained(model_id)
+
+# Clear sampling-only defaults and set pad token explicitly.
+model.generation_config.top_p = None
+model.generation_config.top_k = None
+model.generation_config.pad_token_id = tokenizer.eos_token_id
+
+# --- Send a prompt and wait for a reply ---
+prompt = "What is a sorting algorithm ?"
+messages = [{"role": "user", "content": prompt}]
+
+inputs = tokenizer.apply_chat_template(
+    messages,
+    add_generation_prompt=True,
+    return_tensors="pt",
+    return_dict=True,
+).to(model.device)
+
+with torch.no_grad():
+    output = model.generate(**inputs, max_new_tokens=200, do_sample=False)
+
+reply = tokenizer.decode(
+  output[0][inputs["input_ids"].shape[-1]:], 
+  skip_special_tokens=True,
+).strip()
+print("=== Reply ===")
+print(reply)
+```
+
+#### 2. Count parameters and estimate memory
+
+Knowing the size of the model tells you whether it will fit in RAM/VRAM:
+
+```python
+# --- Count parameters and estimate memory ---
+total_params = sum(p.numel() for p in model.parameters())
+trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+bytes_per_param = next(model.parameters()).element_size()
+mem_mb = total_params * bytes_per_param / (1024 ** 2)
+
+print("\n=== Model size ===")
+print(f"Total parameters:     {total_params:,}")
+print(f"Trainable parameters: {trainable_params:,}")
+print(f"Bytes per parameter:  {bytes_per_param}")
+print(f"Estimated memory:     {mem_mb:.2f} MB")
+```
+
+#### 3. Benchmark tokens per second
+
+Tokens per second is the number that determines whether an SLM is usable
+in your application:
+
+```python
+# --- Benchmark tokens per second ---
+bench_prompt = "Explain what a neural network is:"
+bench_inputs = tokenizer(bench_prompt, return_tensors="pt").to(model.device)
+
+start = time.time()
+with torch.no_grad():
+    bench_output = model.generate(**bench_inputs, max_new_tokens=100, do_sample=False)
+elapsed = time.time() - start
+
+new_tokens = bench_output.shape[-1] - bench_inputs["input_ids"].shape[-1]
+print("\n=== Benchmark ===")
+print(f"Tokens/second: {new_tokens / elapsed:.1f}")
+print(f"Latency:       {elapsed:.2f}s for {new_tokens} tokens")
+
+# --- Context-window limits ---
+sample_text = "The quick brown fox jumps over the lazy dog. " * 100
+tokens = tokenizer.encode(sample_text)
+context_limit = model.config.max_position_embeddings
+```
+
+#### 4. Context-window limits
+
+SLMs typically have smaller context windows than frontier models. When
+you exceed the limit the model either truncates (silently losing early
+context) or errors out — which is precisely why techniques like RAG
+exist:
+
+```python
+# --- Context-window limits ---
+sample_text = "The quick brown fox jumps over the lazy dog. " * 100
+tokens = tokenizer.encode(sample_text)
+context_limit = model.config.max_position_embeddings
+
+print("\n=== Context window ===")
+print(f"Text length (chars): {len(sample_text)}")
+print(f"Token count:         {len(tokens)}")
+print(f"Context limit:       {context_limit} tokens")
+print(f"Fits in context:     {len(tokens) <= context_limit}")
+```
+
+#### Final result
+
+With the steps above, you can run an SLM locally on a personal computer or laptop.
+
+Please note that the same code recipe works for Phi, Llama 3.2,
+Gemma 2, Qwen2.5, and SmolLM2 — only the model id and chat template
+might change.
+
+Final listing below:
+
+
+```python
+import time
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM
+
+# --- Instantiate model and tokenizer by ID ---
+model_id = "google/gemma-3-270m-it"
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+model = AutoModelForCausalLM.from_pretrained(model_id)
+
+# Clear sampling-only defaults and set pad token explicitly.
+model.generation_config.top_p = None
+model.generation_config.top_k = None
+model.generation_config.pad_token_id = tokenizer.eos_token_id
+
+# --- Send a prompt and wait for a reply ---
+prompt = "What is a sorting algorithm ?"
+messages = [{"role": "user", "content": prompt}]
+
+inputs = tokenizer.apply_chat_template(
+    messages,
+    add_generation_prompt=True,
+    return_tensors="pt",
+    return_dict=True,
+).to(model.device)
+
+with torch.no_grad():
+    output = model.generate(**inputs, max_new_tokens=200, do_sample=False)
+
+reply = tokenizer.decode(
+    output[0][inputs["input_ids"].shape[-1]:],
+    skip_special_tokens=True,
+).strip()
+print("=== Reply ===")
+print(reply)
+
+# --- Count parameters and estimate memory ---
+total_params = sum(p.numel() for p in model.parameters())
+trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+bytes_per_param = next(model.parameters()).element_size()
+mem_mb = total_params * bytes_per_param / (1024 ** 2)
+
+print("\n=== Model size ===")
+print(f"Total parameters:     {total_params:,}")
+print(f"Trainable parameters: {trainable_params:,}")
+print(f"Bytes per parameter:  {bytes_per_param}")
+print(f"Estimated memory:     {mem_mb:.2f} MB")
+
+# --- Benchmark tokens per second ---
+bench_prompt = "Explain what a neural network is:"
+bench_inputs = tokenizer(bench_prompt, return_tensors="pt").to(model.device)
+
+start = time.time()
+with torch.no_grad():
+    bench_output = model.generate(**bench_inputs, max_new_tokens=100, do_sample=False)
+elapsed = time.time() - start
+
+new_tokens = bench_output.shape[-1] - bench_inputs["input_ids"].shape[-1]
+print("\n=== Benchmark ===")
+print(f"Tokens/second: {new_tokens / elapsed:.1f}")
+print(f"Latency:       {elapsed:.2f}s for {new_tokens} tokens")
+
+# --- Context-window limits ---
+sample_text = "The quick brown fox jumps over the lazy dog. " * 100
+tokens = tokenizer.encode(sample_text)
+context_limit = model.config.max_position_embeddings
+
+print("\n=== Context window ===")
+print(f"Text length (chars): {len(sample_text)}")
+print(f"Token count:         {len(tokens)}")
+print(f"Context limit:       {context_limit} tokens")
+print(f"Fits in context:     {len(tokens) <= context_limit}")
+```
+
+
+### Start an SLM with ollama
+
+If `transformers` feels heavy, an alternative (perhaps simpler method) is to use [Ollama](https://ollama.com) which can reduce the whole coding loop depending on the use case.
+
+**step 1 - install model phi3 with ollama**
+
+```bash
+ollama pull phi3
+ollama run phi3
+```
+
+**step 2 - instantiate and interact with model**
+
+```python
+# pip install ollama
+import ollama
+
+response = ollama.chat(
+    model="phi3",
+    messages=[
+        {"role": "user", "content": "What is the difference between an SLM and an LLM?"},
+    ],
+)
+print(response["message"]["content"])
+```
+
+
+### Limitations of SLMs
+
+* **Reasoning depth** — multi-step reasoning degrades noticeably below ~7B parameters.
+* **Knowledge breadth** — smaller models carry much less knowledge about the world.
+* **Context length** — many SLMs cap out at 2K–8K tokens vs. 128K+ for frontier models.
+* **Instruction following** — small models drift from instructions more often, especially on longer prompts.
+* **Math and code** — still not good enough at math and code, although SLMs are getting better at it.
+
+
+**PS:** The honest summary: if you need broad world knowledge, nuanced reasoning,
+or 100K-token documents, use a big model via API. For focused tasks on
+your own data, with low latency and zero cloud cost, SLMs are ready.
+
+
+### Conclusions
+
+Keep an eye on the release of new small language models since they generally get
+better every six months.
+
+Some implications of SLM evolution are:
+
+* **AI democratization** — AI-powered software without the need for AI companies or cloud.
+* **Privacy by default** — sensitive data never leaves the device.
+* **Edge AI** — language models that can run on devices such as cars and phones.
+* **Fine-tuning potential** — a fine-tuned model for your domain often beats a general LLM.
+
