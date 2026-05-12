@@ -6,7 +6,10 @@ website:
   title: "Mukeka & Tech"
   twitter-card: true
   open-graph: true
-  cookie-consent: true
+  google-analytics: "G-9NBL5EXRFV"
+  cookie-consent:
+    type: implied
+    style: simple
 
   navbar:
     right:
